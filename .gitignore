@@ -1,0 +1,14 @@
+venv
+*/__pycache__*
+*.pyc
+.idea
+.env
+*.session*
+*.db
+report.html
+.coverage
+reports
+/.scannerwork
+*.properties
+userlist.txt
+pgbouncer.ini
