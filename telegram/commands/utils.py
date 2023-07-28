@@ -14,6 +14,7 @@ class SupportedCommands(Enum):
     """Enum for supported commands."""
 
     START: str = "/start"
+    TEMP: str = "/temp"
 
     @classmethod
     def get_values(cls) -> List[str]:

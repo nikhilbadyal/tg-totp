@@ -4,6 +4,7 @@ from loguru import logger
 from telethon import TelegramClient
 
 from telegram.commands.start import add_start_handlers
+from telegram.commands.temp import add_temp_handlers
 
 
 class Telegram(object):
@@ -42,6 +43,7 @@ class Telegram(object):
 
         # Register event handlers for each command the bot can handle
         add_start_handlers(self.client)
+        add_temp_handlers(self.client)
 
         # Start listening for incoming bot messages
         self.client.run_until_disconnected()

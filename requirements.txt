@@ -5,6 +5,7 @@ loguru==0.7.0
 openai==0.27.8
 pre-commit==3.3.3
 psycopg2-binary==2.9.6   # https://github.com/psycopg/psycopg2
+pyotp==2.9.0 #https://pypi.org/project/pyotp/
 pytest-cov==4.1.0 #https://github.com/pytest-dev/pytest-cov
 pytest-django==4.5.2
 pytest-html==3.2.0  #https://github.com/pytest-dev/pytest-html
