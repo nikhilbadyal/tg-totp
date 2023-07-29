@@ -5,6 +5,7 @@ import pyotp
 from loguru import logger
 
 from telegram.commands.strings import invalid_secret
+from telegram.commands.utils import is_valid_2fa_secret
 
 
 class OTP(object):
@@ -14,7 +15,11 @@ class OTP(object):
     def now(secret: str) -> str:
         """Generate TOTP."""
         try:
-            totp = str(pyotp.TOTP(secret).now())
+            is_valid_2fa_secret(secret)
+            return str(pyotp.TOTP(secret).now())
+        except ValueError:
+            totp = invalid_secret
+            logger.error(f"Failed to generate TOTP for {secret}")
         except Exception as exc:
             totp = invalid_secret
             logger.error(f"Failed to generate TOTP for {secret}")
