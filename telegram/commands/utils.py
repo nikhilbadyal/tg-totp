@@ -1,10 +1,16 @@
 """Utility functions."""
 from enum import Enum
-from typing import List
+from typing import Dict, List
 
+import pyotp
+from django.utils.translation import gettext as _
 from loguru import logger
 from telethon import events
 from telethon.tl.types import User
+
+from sqlitedb.models import Secret
+from telegram.commands.exceptions import InvalidSecret
+from telegram.commands.strings import missing_secret_issuer
 
 PAGE_SIZE = 10  # Number of conversations per page
 
@@ -15,6 +21,7 @@ class SupportedCommands(Enum):
 
     START: str = "/start"
     TEMP: str = "/temp"
+    ADD: str = "/add"
 
     @classmethod
     def get_values(cls) -> List[str]:
@@ -62,3 +69,35 @@ def get_regex() -> str:
     # Exclude any message that starts with one of the supported commands using negative lookahead
     pattern = r"^(?!(%s))[^/].*" % "|".join(SupportedCommands.get_values())
     return pattern
+
+
+def parse_secret(secret_string: str) -> Dict[str, str]:
+    """Parse Secret."""
+    # Split the input string into key-value pairs
+    key_value_pairs = secret_string.split(",")
+
+    # Initialize a dictionary to store the values
+    secret_data = {}
+
+    # Loop through each key-value pair and extract the values
+    for pair in key_value_pairs:
+        key, value = pair.split("=")
+        if key in Secret.objects.possible_inputs():
+            secret_data[key.strip()] = value.strip()
+
+    # Check if 'secret' and 'issuer' fields are present in the secret_data
+    if "secret" not in secret_data or "issuer" not in secret_data:
+        raise ValueError(_(missing_secret_issuer))
+
+    return secret_data
+
+
+def is_valid_2fa_secret(secret: str) -> bool:
+    """Validate if 2fa secret is valid."""
+    # noinspection PyBroadException
+    try:
+        # Attempt to create a TOTP object based on the provided secret
+        pyotp.TOTP(secret).now()
+        return True
+    except Exception:
+        raise InvalidSecret()
