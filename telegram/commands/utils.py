@@ -10,9 +10,10 @@ from telethon.tl.types import User
 
 from sqlitedb.models import Secret
 from telegram.commands.exceptions import InvalidSecret
-from telegram.commands.strings import missing_secret_issuer
+from telegram.commands.strings import no_input
 
-PAGE_SIZE = 10  # Number of conversations per page
+# Number of conversations per page
+PAGE_SIZE = 10
 
 
 # Define a list of supported commands
@@ -116,7 +117,7 @@ def parse_secret(secret_string: str) -> Dict[str, str]:
 
     # Check if 'secret' and 'issuer' fields are present in the secret_data
     if "secret" not in secret_data or "issuer" not in secret_data:
-        raise ValueError(_(missing_secret_issuer))
+        raise ValueError(_(no_input))
 
     return secret_data
 

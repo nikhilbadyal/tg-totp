@@ -11,7 +11,7 @@ from telegram.commands.strings import (
     added_secret,
     duplicate_secret,
     invalid_secret,
-    missing_secret_issuer,
+    no_input,
 )
 
 # Import some helper functions
@@ -59,6 +59,6 @@ async def handle_add_message(event: events.NewMessage.Event) -> None:
     except InvalidSecret:
         await event.reply(invalid_secret)
     except ValueError:
-        await event.reply(missing_secret_issuer)
+        await event.reply(no_input)
     except DuplicateSecret:
         await event.reply(duplicate_secret)
