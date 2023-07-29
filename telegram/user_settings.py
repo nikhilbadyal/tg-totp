@@ -25,7 +25,7 @@ async def modify_page_size(
     """
     try:
         page_size = int(new_value)
-        if page_size < 1:
+        if page_size < 1 or page_size > 10:
             raise ValueError()
 
         user_settings[UserSettings.PAGE_SIZE.value] = str(page_size)
