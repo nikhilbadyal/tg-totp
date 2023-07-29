@@ -172,6 +172,21 @@ class SecretManager(models.Manager):  # type: ignore
         size = len(data)
         return data, size
 
+    def export_secrets(self, user: User) -> Tuple[Any, int]:
+        """Return all secrets for a given user.
+
+        Args:
+            user (User): User.
+
+        Returns:
+            tuple: Data and the no of records in it
+        """
+        # Retrieve the conversations for the given user
+        # noinspection PyTypeChecker
+        data = self.filter(user=user)
+        size = len(data)
+        return data, size
+
     def reduced_print(self, secret: "Secret") -> Any:
         """Print Secret with minial details.
 
@@ -185,6 +200,27 @@ class SecretManager(models.Manager):  # type: ignore
             account=secret.account_id,
             issuer=secret.issuer,
         )
+
+    def export_print(self, secret: "Secret") -> Any:
+        """Print Secret with minial details.
+
+        Returns:
+            str: String repr of secret.
+        """
+        return (
+            "otpauth://totp/{issuer}%3A{account}?period={period}&digits={digits}&"
+            "algorithm={algorithm}&secret={secret}&issuer={issuer}"
+        ).format(
+            issuer=secret.issuer.strip(),
+            account=secret.account_id.strip(),
+            period=secret.period,
+            digits=secret.digits,
+            algorithm=secret.algorithm.strip(),
+            secret=secret.secret.strip(),
+        )
+
+
+#
 
 
 class Secret(models.Model):
