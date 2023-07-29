@@ -1,7 +1,7 @@
 """Models."""
 import operator
 from functools import reduce
-from typing import Any, List, Tuple, Dict
+from typing import Any, Dict, Tuple
 
 from django.db import models
 from django.db.models import Field, Q
@@ -113,7 +113,7 @@ class SecretManager(models.Manager):  # type: ignore
         secret = self.create(user=user, **kwargs)
         return secret  # type: ignore
 
-    def possible_inputs(self) -> Dict[str,str]:
+    def possible_inputs(self) -> Dict[str, str]:
         """Possible input."""
         inputs = {
             "secret": "secret",

@@ -149,19 +149,19 @@ async def add_secret_data(secret_data: Dict[str, str], user: User) -> str:
 
 async def bulk_add_secret_data(
     secrets: List[Dict[str, str]], user: User
-) -> Tuple[Dict[str, int], List[Dict[str, str]]]:
+) -> Tuple[Dict[str, int], Dict[str, List[Dict[str, str]]]]:
     """Add secret data."""
     status = {"invalid": 0, "duplicate": 0}
-    failed_secrets = []
+    failed_secrets: Dict[str, List[Dict[str, str]]] = {"invalid": [], "duplicate": []}
     for secret_data in secrets:
         try:
             await add_secret_data(secret_data, user)
         except InvalidSecret:
             status["invalid"] += 1
-            failed_secrets.append(secret_data)
+            failed_secrets["invalid"].append(secret_data)
         except DuplicateSecret:
             status["duplicate"] += 1
-            failed_secrets.append(secret_data)
+            failed_secrets["duplicate"].append(secret_data)
     return status, failed_secrets
 
 
@@ -206,7 +206,7 @@ def extract_secret_from_uri(uris: List[str]) -> List[Dict[str, str]]:
     return secrets
 
 
-def import_failure_output_file(import_failures: List[Dict[str, str]]) -> str:
+def import_failure_output_file(import_failures: Dict[str, List[Dict[str, str]]]) -> str:
     """Prepare failed record file."""
     output_file = "output-data.json"
     with open(output_file, "w", encoding="utf-8") as f:
