@@ -158,8 +158,8 @@ class SecretManager(models.Manager):  # type: ignore
         """
         # Retrieve the conversations for the given user
         filter_kwargs = {
-            "account_id__ilike": secret_filter,
-            "issuer__ilike": secret_filter,
+            "account_id__icontains": secret_filter,
+            "issuer__icontains": secret_filter,
         }
         or_filters = [Q(**{key: val}) for key, val in filter_kwargs.items()]
         # noinspection PyTypeChecker
