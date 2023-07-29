@@ -6,7 +6,7 @@ from loguru import logger
 from telethon.tl.types import User as TelegramUser
 
 from manage import init_django
-from sqlitedb.utils import ErrorCodes, UserStatus
+from sqlitedb.utils import ErrorCodes, UserStatus, paginate_queryset
 from telegram.commands.exceptions import DuplicateSecret
 
 init_django()
@@ -116,6 +116,27 @@ class SecretManager(models.Manager):  # type: ignore
         """Possible input."""
         return ["secret", "issuer", "account_id", "digits", "period", "algorithm"]
 
+    def get_secrets(self, user: User, page: int, per_page: int) -> Any:
+        """Return a paginated list of secrets for a given user.
+
+        Args:
+            user (User): User.
+            page (int): The current page number.
+            per_page (int): The number of conversations to display per page.
+
+        Returns:
+            dict: A dictionary containing the paginated conversations and pagination details.
+        """
+        # Retrieve the conversations for the given user
+        data = (
+            self.only("id", "issuer", "account_id", "secret", "joining_date")
+            .filter(user=user)
+            .order_by("-last_updated")
+        )
+
+        # Use the helper function to paginate the queryset
+        return paginate_queryset(data, page, per_page)
+
 
 class Secret(models.Model):
     """Model to store secrets."""
@@ -159,4 +180,7 @@ class Secret(models.Model):
 
     def __str__(self) -> str:
         """Return a string representation of the user object."""
-        return f"Secret(user={self.user}, secret={self.secret}, issue={self.issuer}, added_on={self.joining_date})"
+        return (
+            f"Secret [{self.secret}](spoiler) for {self.issuer} with ID {self.id} added on"
+            f" {self.joining_date.strftime('%b %d, %Y %I:%M:%S %p')}"
+        )

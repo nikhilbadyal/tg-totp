@@ -22,6 +22,7 @@ class SupportedCommands(Enum):
     START: str = "/start"
     TEMP: str = "/temp"
     ADD: str = "/add"
+    LIST: str = "/list"
 
     @classmethod
     def get_values(cls) -> List[str]:
