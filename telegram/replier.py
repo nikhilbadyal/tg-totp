@@ -6,6 +6,7 @@ from telethon import TelegramClient
 from telegram.commands.add import add_add_handlers
 from telegram.commands.start import add_start_handlers
 from telegram.commands.temp import add_temp_handlers
+from telegram.util import CustomMarkdown
 
 
 class Telegram(object):
@@ -32,6 +33,7 @@ class Telegram(object):
         self.client.start(bot_token=env.str("BOT_TOKEN"))
         # Check if the connection was successful
         if self.client.is_connected():
+            self.client.parse_mode = CustomMarkdown()
             logger.info("Connected to Telegram")
             logger.info("Using bot authentication. Only bot messages are recognized.")
         else:
