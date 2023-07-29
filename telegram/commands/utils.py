@@ -1,7 +1,8 @@
 """Utility functions."""
+import json
 import os
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 import pyotp
 from asgiref.sync import sync_to_async
@@ -148,17 +149,20 @@ async def add_secret_data(secret_data: Dict[str, str], user: User) -> str:
 
 async def bulk_add_secret_data(
     secrets: List[Dict[str, str]], user: User
-) -> Dict[str, int]:
+) -> Tuple[Dict[str, int], List[Dict[str, str]]]:
     """Add secret data."""
     status = {"invalid": 0, "duplicate": 0}
+    failed_secrets = []
     for secret_data in secrets:
         try:
             await add_secret_data(secret_data, user)
         except InvalidSecret:
             status["invalid"] += 1
+            failed_secrets.append(secret_data)
         except DuplicateSecret:
             status["duplicate"] += 1
-    return status
+            failed_secrets.append(secret_data)
+    return status, failed_secrets
 
 
 async def get_uri_file_from_message(event: events.NewMessage.Event) -> str:
@@ -200,3 +204,11 @@ def extract_secret_from_uri(uris: List[str]) -> List[Dict[str, str]]:
     except InvalidSecret as e:
         raise FileProcessFail(e)
     return secrets
+
+
+def import_failure_output_file(import_failures: List[Dict[str, str]]) -> str:
+    """Prepare failed record file."""
+    output_file = "output-data.json"
+    with open(output_file, "w", encoding="utf-8") as f:
+        json.dump(import_failures, f, ensure_ascii=False, indent=4)
+    return output_file

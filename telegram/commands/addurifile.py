@@ -1,4 +1,6 @@
 """Handle addurifile command."""
+import os
+
 from asgiref.sync import sync_to_async
 
 # Import necessary libraries and modules
@@ -16,6 +18,7 @@ from telegram.commands.utils import (
     extract_secret_from_uri,
     get_uri_file_from_message,
     get_user,
+    import_failure_output_file,
     process_uri_file,
 )
 
@@ -45,7 +48,10 @@ async def handle_addurifile_message(event: events.NewMessage.Event) -> None:
         secrets = extract_secret_from_uri(uris)
         telegram_user: TelegramUser = await get_user(event)
         user = await sync_to_async(User.objects.get_user)(telegram_user.id)
-        response = await bulk_add_secret_data(secrets, user)
-        await message.edit(f"Done processing with status `{response}`")
+        import_status, import_failures = await bulk_add_secret_data(secrets, user)
+        output_file = import_failure_output_file(import_failures)
+        await message.edit(f"Done processing with status `{import_status}`")
+        await event.respond(file=output_file)
+        os.remove(output_file)
     except (FileNotFoundError, FileProcessFail):
         await message.edit(file_process_failed)
