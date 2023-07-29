@@ -45,7 +45,7 @@ async def handle_get_message(event: events.NewMessage.Event) -> None:
     data, size = await sync_to_async(Secret.objects.get_secret)(
         user=user, secret_filter=secret_filter
     )
-    response = f"Here are **{size}** found secrets with their TOTP:\n\n"
+    response = f"Here are the TOTP for **{size}** found secrets.\n\n"
     for secret in data:
         response += f"{Secret.objects.reduced_print(secret)}\n"
     await event.reply(response)
