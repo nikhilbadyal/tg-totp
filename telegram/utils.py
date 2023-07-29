@@ -182,11 +182,12 @@ async def bulk_add_secret_data(
     secrets: List[Dict[str, str]], user: User
 ) -> Tuple[Dict[str, int], Dict[str, List[Dict[str, str]]]]:
     """Add secret data."""
-    status = {"invalid": 0, "duplicate": 0}
+    status = {"invalid": 0, "duplicate": 0, "success": 0}
     failed_secrets: Dict[str, List[Dict[str, str]]] = {"invalid": [], "duplicate": []}
     for secret_data in secrets:
         try:
             await add_secret_data(secret_data, user)
+            status["success"] += 1
         except InvalidSecret:
             status["invalid"] += 1
             failed_secrets["invalid"].append(secret_data)
