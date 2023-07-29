@@ -120,6 +120,9 @@ class SecretManager(models.Manager):  # type: ignore
 class Secret(models.Model):
     """Model to store secrets."""
 
+    # Secret ID, auto-generated primary key
+    id = models.AutoField(primary_key=True)
+
     # Foreign Key to user
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
