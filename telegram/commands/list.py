@@ -61,6 +61,7 @@ async def send_paginated_conversations(
         response += f"- {secret}\n"
 
     response += f"\nPage {result['current_page']} of {result['total_pages']}"
+    response += f"\n[Total records {result['total_data']}](spoiler)"
 
     buttons: List[Button] = []
     if result["has_previous"]:
