@@ -8,7 +8,7 @@ from telethon.tl.types import User as TelegramUser
 from sqlitedb.models import User
 
 # Import some helper functions
-from telegram.commands.utils import SupportedCommands, get_user
+from telegram.utils import SupportedCommands, get_user
 
 
 def add_start_handlers(client: TelegramClient) -> None:

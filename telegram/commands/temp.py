@@ -2,10 +2,10 @@
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
 
-from telegram.commands.strings import no_input
+from telegram.strings import no_input
 
 # Import some helper functions
-from telegram.commands.utils import SupportedCommands
+from telegram.utils import SupportedCommands
 from totp.totp import OTP
 
 

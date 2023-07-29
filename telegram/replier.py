@@ -11,7 +11,7 @@ from telegram.commands.list import add_list_handlers
 from telegram.commands.settings import add_settings_handlers
 from telegram.commands.start import add_start_handlers
 from telegram.commands.temp import add_temp_handlers
-from telegram.util import CustomMarkdown
+from telegram.utils import CustomMarkdown
 
 
 class Telegram(object):

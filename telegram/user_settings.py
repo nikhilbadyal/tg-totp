@@ -5,7 +5,7 @@ from asgiref.sync import sync_to_async
 from telethon import events
 
 from sqlitedb.models import User
-from telegram.commands.utils import UserSettings
+from telegram.utils import UserSettings
 
 
 async def modify_page_size(

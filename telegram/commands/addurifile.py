@@ -8,11 +8,11 @@ from telethon import TelegramClient, events
 from telethon.tl.types import User as TelegramUser
 
 from sqlitedb.models import User
-from telegram.commands.exceptions import FileProcessFail
-from telegram.commands.strings import file_process_failed, processing_file
+from telegram.exceptions import FileProcessFail
+from telegram.strings import file_process_failed, processing_file
 
 # Import some helper functions
-from telegram.commands.utils import (
+from telegram.utils import (
     SupportedCommands,
     bulk_add_secret_data,
     extract_secret_from_uri,

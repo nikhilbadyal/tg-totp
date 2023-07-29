@@ -5,9 +5,9 @@ from loguru import logger
 from telethon import Button, TelegramClient, events
 
 from sqlitedb.models import User
-from telegram.commands.strings import invalid_setting, user_fetch_failed
-from telegram.commands.user_settings import modify_page_size
-from telegram.commands.utils import SupportedCommands, UserSettings
+from telegram.strings import invalid_setting, user_fetch_failed
+from telegram.user_settings import modify_page_size
+from telegram.utils import SupportedCommands, UserSettings
 
 
 def add_settings_handlers(client: TelegramClient) -> None:

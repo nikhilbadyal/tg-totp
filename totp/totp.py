@@ -6,9 +6,9 @@ import pyotp
 from loguru import logger
 
 from sqlitedb.models import Secret
-from telegram.commands.exceptions import InvalidSecret
-from telegram.commands.strings import invalid_secret
-from telegram.commands.utils import is_valid_2fa_secret
+from telegram.exceptions import InvalidSecret
+from telegram.strings import invalid_secret
+from telegram.utils import is_valid_2fa_secret
 
 
 class OTP(object):

@@ -8,15 +8,46 @@ import pyotp
 from asgiref.sync import sync_to_async
 from django.utils.translation import gettext as _
 from loguru import logger
-from telethon import events
+from telethon import events, types
+from telethon.extensions import markdown
 from telethon.tl.types import User
 
 from sqlitedb.models import Secret
-from telegram.commands.exceptions import DuplicateSecret, FileProcessFail, InvalidSecret
-from telegram.commands.strings import added_secret, no_input
+from telegram.exceptions import DuplicateSecret, FileProcessFail, InvalidSecret
+from telegram.strings import added_secret, no_input
 
 # Number of conversations per page
 PAGE_SIZE = 10
+
+
+class CustomMarkdown:
+    """Custom Markdown parser."""
+
+    @staticmethod
+    def parse(text: str) -> Any:
+        """Parse."""
+        text, entities = markdown.parse(text)
+        for i, e in enumerate(entities):
+            if isinstance(e, types.MessageEntityTextUrl):
+                if e.url == "spoiler":
+                    entities[i] = types.MessageEntitySpoiler(e.offset, e.length)
+                elif e.url.startswith("emoji/"):
+                    entities[i] = types.MessageEntityCustomEmoji(
+                        e.offset, e.length, int(e.url.split("/")[1])
+                    )
+        return text, entities
+
+    @staticmethod
+    def unparse(text: str, entities: Any) -> Any:
+        """Unparse."""
+        for i, e in enumerate(entities or []):
+            if isinstance(e, types.MessageEntityCustomEmoji):
+                entities[i] = types.MessageEntityTextUrl(
+                    e.offset, e.length, f"emoji/{e.document_id}"
+                )
+            if isinstance(e, types.MessageEntitySpoiler):
+                entities[i] = types.MessageEntityTextUrl(e.offset, e.length, "spoiler")
+        return markdown.unparse(text, entities)
 
 
 # Define a list of supported commands

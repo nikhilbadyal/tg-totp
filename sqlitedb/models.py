@@ -10,7 +10,7 @@ from loguru import logger
 from manage import init_django
 from sqlitedb.lookups import Like
 from sqlitedb.utils import UserStatus, paginate_queryset
-from telegram.commands.exceptions import DuplicateSecret
+from telegram.exceptions import DuplicateSecret
 
 init_django()
 

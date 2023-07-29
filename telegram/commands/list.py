@@ -6,8 +6,8 @@ from loguru import logger
 from telethon import Button, TelegramClient, events
 
 from sqlitedb.models import Secret, User
-from telegram.commands.strings import user_fetch_failed
-from telegram.commands.utils import PAGE_SIZE, SupportedCommands
+from telegram.strings import user_fetch_failed
+from telegram.utils import PAGE_SIZE, SupportedCommands
 
 
 def add_list_handlers(client: TelegramClient) -> None:

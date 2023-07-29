@@ -6,10 +6,10 @@ from telethon import TelegramClient, events
 from telethon.tl.types import User as TelegramUser
 
 from sqlitedb.models import Secret, User
-from telegram.commands.strings import no_input
+from telegram.strings import no_input
 
 # Import some helper functions
-from telegram.commands.utils import SupportedCommands, get_user
+from telegram.utils import SupportedCommands, get_user
 
 
 def add_get_handlers(client: TelegramClient) -> None:
