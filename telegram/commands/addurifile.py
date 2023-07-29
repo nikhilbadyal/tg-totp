@@ -9,7 +9,7 @@ from telethon.tl.types import User as TelegramUser
 
 from sqlitedb.models import User
 from telegram.exceptions import FileProcessFail
-from telegram.strings import file_process_failed, processing_file
+from telegram.strings import file_process_failed, no_input, processing_file
 
 # Import some helper functions
 from telegram.utils import (
@@ -39,11 +39,10 @@ async def handle_addurifile_message(event: events.NewMessage.Event) -> None:
     Returns:
         None: This function doesn't return anything.
     """
-    # Define a prefix for the image URL
-    message = await event.reply(processing_file)
-
+    message = None
     try:
         uri_file = await get_uri_file_from_message(event)
+        message = await event.reply(processing_file)
         uris = process_uri_file(uri_file)
         secrets = extract_secret_from_uri(uris)
         telegram_user: TelegramUser = await get_user(event)
@@ -53,5 +52,8 @@ async def handle_addurifile_message(event: events.NewMessage.Event) -> None:
         await message.edit(f"Done processing with status `{import_status}`")
         await event.respond(file=output_file)
         os.remove(output_file)
-    except (FileNotFoundError, FileProcessFail):
-        await message.edit(file_process_failed)
+    except FileNotFoundError:
+        await event.reply(no_input)
+    except FileProcessFail:
+        if message:
+            await message.edit(file_process_failed)
