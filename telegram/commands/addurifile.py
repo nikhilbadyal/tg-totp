@@ -54,6 +54,6 @@ async def handle_addurifile_message(event: events.NewMessage.Event) -> None:
         os.remove(output_file)
     except FileNotFoundError:
         await event.reply(no_input)
-    except FileProcessFail:
+    except FileProcessFail as e:
         if message:
-            await message.edit(file_process_failed)
+            await message.edit(f"Unable to process\n`{e}`.\n{file_process_failed}")

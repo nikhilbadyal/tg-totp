@@ -228,12 +228,12 @@ def extract_secret_from_uri(uris: List[str]) -> List[Dict[str, str]]:
     from totp.totp import OTP
 
     secrets = []
-    try:
-        for uri in uris:
+    for uri in uris:
+        try:
             secret_data = OTP.parse_uri(uri)
             secrets.append(secret_data)
-    except InvalidSecret as e:
-        raise FileProcessFail(e)
+        except InvalidSecret:
+            raise FileProcessFail(uri)
     return secrets
 
 
