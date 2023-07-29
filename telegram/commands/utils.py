@@ -3,14 +3,20 @@ from enum import Enum
 from typing import Any, Dict, List, Optional
 
 import pyotp
+from asgiref.sync import sync_to_async
 from django.utils.translation import gettext as _
 from loguru import logger
 from telethon import events
 from telethon.tl.types import User
 
 from sqlitedb.models import Secret
-from telegram.commands.exceptions import InvalidSecret
-from telegram.commands.strings import no_input
+from telegram.commands.exceptions import DuplicateSecret, InvalidSecret
+from telegram.commands.strings import (
+    added_secret,
+    duplicate_secret,
+    invalid_secret,
+    no_input,
+)
 
 # Number of conversations per page
 PAGE_SIZE = 10
@@ -26,6 +32,7 @@ class SupportedCommands(Enum):
     LIST: str = "/list"
     SETTINGS: str = "/settings"
     GET: str = "/get"
+    ADDURI: str = "/adduri"
 
     @classmethod
     def get_values(cls) -> List[str]:
@@ -132,3 +139,21 @@ def is_valid_2fa_secret(secret: str) -> bool:
         return True
     except Exception:
         raise InvalidSecret()
+
+
+async def add_secret_data(
+    secret_data: Dict[str, str], event: events.NewMessage.Event
+) -> str:
+    """Add secret data."""
+    try:
+        is_valid_2fa_secret(secret_data["secret"])
+        # Get the user associated with the message
+        telegram_user: User = await get_user(event)
+        await sync_to_async(Secret.objects.create_secret)(
+            telegram_user=telegram_user, **secret_data
+        )
+        return added_secret
+    except InvalidSecret:
+        return invalid_secret
+    except DuplicateSecret:
+        return duplicate_secret
