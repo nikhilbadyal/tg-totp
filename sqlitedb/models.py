@@ -1,7 +1,7 @@
 """Models."""
 import operator
 from functools import reduce
-from typing import Any, List, Tuple
+from typing import Any, List, Tuple, Dict
 
 from django.db import models
 from django.db.models import Field, Q
@@ -113,9 +113,17 @@ class SecretManager(models.Manager):  # type: ignore
         secret = self.create(user=user, **kwargs)
         return secret  # type: ignore
 
-    def possible_inputs(self) -> List[str]:
+    def possible_inputs(self) -> Dict[str,str]:
         """Possible input."""
-        return ["secret", "issuer", "account_id", "digits", "period", "algorithm"]
+        inputs = {
+            "secret": "secret",
+            "issuer": "issuer",
+            "digits": "digits",
+            "name": "account_id",
+            "period": "period",
+            "algorithm": "algorithm",
+        }
+        return inputs
 
     def get_secrets(self, user: User, page: int, per_page: int) -> Any:
         """Return a paginated list of secrets for a given user.
