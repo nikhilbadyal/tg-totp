@@ -230,6 +230,6 @@ class Secret(models.Model):
     def __str__(self) -> str:
         """Return a string representation of the user object."""
         return (
-            f"Secret [{self.secret}](spoiler) issued by {self.issuer} for {self.account_id} with ID {self.id} added on"
+            f"Secret [{self.secret}](spoiler) issued by {self.issuer} for {self.account_id} added on"
             f" {self.joining_date.strftime('%b %d, %Y %I:%M:%S %p')}"
         )
