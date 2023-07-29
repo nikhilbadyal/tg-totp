@@ -5,6 +5,7 @@ from asgiref.sync import sync_to_async
 from telethon import events
 
 from sqlitedb.models import User
+from telegram.strings import invalid_page_size, page_size_updated
 from telegram.utils import UserSettings
 
 
@@ -31,8 +32,6 @@ async def modify_page_size(
         user.settings = user_settings
         await sync_to_async(user.save)()
 
-        await event.reply(f"Page size successfully updated to {page_size}.")
+        await event.reply(page_size_updated)
     except ValueError:
-        await event.reply(
-            "Invalid value for page size. Please provide a positive integer."
-        )
+        await event.reply(invalid_page_size)
