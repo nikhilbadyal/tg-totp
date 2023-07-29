@@ -25,6 +25,7 @@ class SupportedCommands(Enum):
     ADD: str = "/add"
     LIST: str = "/list"
     SETTINGS: str = "/settings"
+    GET: str = "/get"
 
     @classmethod
     def get_values(cls) -> List[str]:

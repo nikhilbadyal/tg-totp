@@ -1,15 +1,21 @@
 """Models."""
-from typing import Any, List
+import operator
+from functools import reduce
+from typing import Any, List, Tuple
 
 from django.db import models
+from django.db.models import Field, Q
 from loguru import logger
 from telethon.tl.types import User as TelegramUser
 
 from manage import init_django
+from sqlitedb.lookups import Like
 from sqlitedb.utils import UserStatus, paginate_queryset
 from telegram.commands.exceptions import DuplicateSecret
 
 init_django()
+
+Field.register_lookup(Like)
 
 
 class UserManager(models.Manager):  # type: ignore
@@ -133,6 +139,46 @@ class SecretManager(models.Manager):  # type: ignore
 
         # Use the helper function to paginate the queryset
         return paginate_queryset(data, page, per_page)
+
+    def get_secret(self, user: User, secret_filter: str) -> Tuple[Any, int]:
+        """Return a paginated list of secrets for a given user.
+
+        Args:
+            user (User): User.
+            secret_filter (str): The current page number.
+
+        Returns:
+            tuple: Data and the no of records in it
+        """
+        # Retrieve the conversations for the given user
+        filter_kwargs = {
+            "account_id__ilike": secret_filter,
+            "issuer__ilike": secret_filter,
+        }
+        or_filters = [Q(**{key: val}) for key, val in filter_kwargs.items()]
+        # noinspection PyTypeChecker
+        data = (
+            self.only("issuer", "account_id", "secret")
+            .filter(user=user)
+            .filter(reduce(operator.or_, or_filters))
+            .order_by("issuer")
+        )
+        size = len(data)
+        return data, size
+
+    def reduced_print(self, secret: "Secret") -> Any:
+        """Print Secret with minial details.
+
+        Returns:
+            str: String repr of secret.
+        """
+        from totp.totp import OTP
+
+        return "`{otp}` is OTP for account **{account}** issued by **{issuer}**".format(
+            otp=OTP.now(secret=secret.secret),
+            account=secret.account_id,
+            issuer=secret.issuer,
+        )
 
 
 class Secret(models.Model):
