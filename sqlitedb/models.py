@@ -6,7 +6,6 @@ from typing import Any, List, Tuple
 from django.db import models
 from django.db.models import Field, Q
 from loguru import logger
-from telethon.tl.types import User as TelegramUser
 
 from manage import init_django
 from sqlitedb.lookups import Like
@@ -107,12 +106,11 @@ class User(models.Model):
 class SecretManager(models.Manager):  # type: ignore
     """Manager for the User model."""
 
-    def create_secret(self, telegram_user: TelegramUser, **kwargs: Any) -> "Secret":
+    def create_secret(self, user: User, **kwargs: Any) -> "Secret":
         """Add secret."""
-        user = User.objects.get_user(telegram_user.id)
-        secret, created = self.get_or_create(user=user, **kwargs)
-        if not created:
+        if self.filter(user=user, secret=kwargs["secret"]).exists():
             raise DuplicateSecret()
+        secret = self.create(user=user, **kwargs)
         return secret  # type: ignore
 
     def possible_inputs(self) -> List[str]:

@@ -12,12 +12,7 @@ from telethon.tl.types import User
 
 from sqlitedb.models import Secret
 from telegram.commands.exceptions import DuplicateSecret, FileProcessFail, InvalidSecret
-from telegram.commands.strings import (
-    added_secret,
-    duplicate_secret,
-    invalid_secret,
-    no_input,
-)
+from telegram.commands.strings import added_secret, no_input
 
 # Number of conversations per page
 PAGE_SIZE = 10
@@ -143,34 +138,27 @@ def is_valid_2fa_secret(secret: str) -> bool:
         raise InvalidSecret()
 
 
-async def add_secret_data(
-    secret_data: Dict[str, str], event: events.NewMessage.Event
-) -> str:
+async def add_secret_data(secret_data: Dict[str, str], user: User) -> str:
     """Add secret data."""
-    try:
-        is_valid_2fa_secret(secret_data["secret"])
-        # Get the user associated with the message
-        telegram_user: User = await get_user(event)
-        await sync_to_async(Secret.objects.create_secret)(
-            telegram_user=telegram_user, **secret_data
-        )
-        return added_secret
-    except InvalidSecret:
-        return invalid_secret
-    except DuplicateSecret:
-        return duplicate_secret
+    is_valid_2fa_secret(secret_data["secret"])
+    # Get the user associated with the message
+    await sync_to_async(Secret.objects.create_secret)(user=user, **secret_data)
+    return added_secret
 
 
 async def bulk_add_secret_data(
-    secrets: List[Dict[str, str]], event: events.NewMessage.Event
-) -> List[Dict[str, str]]:
+    secrets: List[Dict[str, str]], user: User
+) -> Dict[str, int]:
     """Add secret data."""
-    failed = []
+    status = {"invalid": 0, "duplicate": 0}
     for secret_data in secrets:
-        result = await add_secret_data(secret_data, event)
-        if result != added_secret:
-            failed.append(secret_data)
-    return failed
+        try:
+            await add_secret_data(secret_data, user)
+        except InvalidSecret:
+            status["invalid"] += 1
+        except DuplicateSecret:
+            status["duplicate"] += 1
+    return status
 
 
 async def get_uri_file_from_message(event: events.NewMessage.Event) -> str:

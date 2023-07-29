@@ -1,13 +1,16 @@
 """Handle adduri command."""
+from asgiref.sync import sync_to_async
 
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
+from telethon.tl.types import User as TelegramUser
 
-from telegram.commands.exceptions import InvalidSecret
-from telegram.commands.strings import invalid_secret
+from sqlitedb.models import User
+from telegram.commands.exceptions import DuplicateSecret, InvalidSecret
+from telegram.commands.strings import duplicate_secret, invalid_secret, no_input
 
 # Import some helper functions
-from telegram.commands.utils import SupportedCommands, add_secret_data
+from telegram.commands.utils import SupportedCommands, add_secret_data, get_user
 from totp.totp import OTP
 
 
@@ -37,7 +40,13 @@ async def handle_adduri_message(event: events.NewMessage.Event) -> None:
     secret_data = event.message.text[prefix_len:]
     try:
         secret_data = OTP.parse_uri(secret_data)
-        response = await add_secret_data(secret_data, event)
+        telegram_user: TelegramUser = await get_user(event)
+        user = await sync_to_async(User.objects.get_user)(telegram_user.id)
+        response = await add_secret_data(secret_data, user)
         await event.reply(response)
     except InvalidSecret:
         await event.reply(invalid_secret)
+    except DuplicateSecret:
+        await event.reply(duplicate_secret)
+    except ValueError:
+        await event.reply(no_input)
