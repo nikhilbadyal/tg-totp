@@ -12,3 +12,4 @@ reports
 *.properties
 userlist.txt
 pgbouncer.ini
+output*.json
