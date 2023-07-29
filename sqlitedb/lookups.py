@@ -11,4 +11,4 @@ class Like(Lookup):  # type: ignore
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
         params = lhs_params + rhs_params
-        return "%s LIKE %s" % (lhs, rhs), params
+        return "%s ILIKE %s" % (lhs, rhs), params
