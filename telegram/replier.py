@@ -5,6 +5,7 @@ from telethon import TelegramClient
 
 from telegram.commands.add import add_add_handlers
 from telegram.commands.list import add_list_handlers
+from telegram.commands.settings import add_settings_handlers
 from telegram.commands.start import add_start_handlers
 from telegram.commands.temp import add_temp_handlers
 from telegram.util import CustomMarkdown
@@ -50,6 +51,7 @@ class Telegram(object):
         add_temp_handlers(self.client)
         add_add_handlers(self.client)
         add_list_handlers(self.client)
+        add_settings_handlers(self.client)
 
         # Start listening for incoming bot messages
         self.client.run_until_disconnected()

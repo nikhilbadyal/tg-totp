@@ -1,6 +1,6 @@
 """Utility functions."""
 from enum import Enum
-from typing import Dict, List
+from typing import Any, Dict, List, Optional
 
 import pyotp
 from django.utils.translation import gettext as _
@@ -23,6 +23,7 @@ class SupportedCommands(Enum):
     TEMP: str = "/temp"
     ADD: str = "/add"
     LIST: str = "/list"
+    SETTINGS: str = "/settings"
 
     @classmethod
     def get_values(cls) -> List[str]:
@@ -70,6 +71,33 @@ def get_regex() -> str:
     # Exclude any message that starts with one of the supported commands using negative lookahead
     pattern = r"^(?!(%s))[^/].*" % "|".join(SupportedCommands.get_values())
     return pattern
+
+
+class UserSettings(Enum):
+    """User Settings."""
+
+    PAGE_SIZE = "page_size", "The number of conversations displayed per page."
+
+    def __new__(cls, *args: Any, **kwds: Any) -> "UserSettings":
+        obj = object.__new__(cls)
+        obj._value_ = args[0]
+        return obj
+
+    # ignore the first param since it's already set by __new__
+    def __init__(self, _: str, description: Optional[str] = None):
+        self._description_ = description
+
+    def __str__(self) -> str:
+        return str(self.value)
+
+    @property
+    def description(self) -> Optional[str]:
+        """Returns the description of the setting.
+
+        Returns:
+            Optional[str]: The description of the setting.
+        """
+        return self._description_
 
 
 def parse_secret(secret_string: str) -> Dict[str, str]:
