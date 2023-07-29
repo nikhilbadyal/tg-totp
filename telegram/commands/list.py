@@ -6,7 +6,7 @@ from loguru import logger
 from telethon import Button, TelegramClient, events
 
 from sqlitedb.models import Secret, User
-from sqlitedb.utils import ErrorCodes
+from telegram.commands.strings import user_fetch_failed
 from telegram.commands.utils import PAGE_SIZE, SupportedCommands
 
 
@@ -46,9 +46,10 @@ async def send_paginated_conversations(
     """
 
     # Fetch user settings
-    user = await sync_to_async(User.objects.get_user)(telegram_id)
-    if isinstance(user, ErrorCodes):
-        raise ValueError("unable to fetch user")
+    try:
+        user = await sync_to_async(User.objects.get_user)(telegram_id)
+    except SystemError:
+        return user_fetch_failed, []
     user_settings = user.settings
 
     page_size = user_settings.get("page_size", PAGE_SIZE)

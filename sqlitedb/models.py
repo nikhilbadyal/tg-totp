@@ -1,12 +1,12 @@
 """Models."""
-from typing import Any, List, Union
+from typing import Any, List
 
 from django.db import models
 from loguru import logger
 from telethon.tl.types import User as TelegramUser
 
 from manage import init_django
-from sqlitedb.utils import ErrorCodes, UserStatus, paginate_queryset
+from sqlitedb.utils import UserStatus, paginate_queryset
 from telegram.commands.exceptions import DuplicateSecret
 
 init_django()
@@ -15,7 +15,7 @@ init_django()
 class UserManager(models.Manager):  # type: ignore
     """Manager for the User model."""
 
-    def get_user(self, telegram_id: int) -> Union["User", ErrorCodes]:
+    def get_user(self, telegram_id: int) -> "User":
         """Retrieve a User object from the database for a given user_id. If the
         user does not exist, create a new user.
 
@@ -23,18 +23,15 @@ class UserManager(models.Manager):  # type: ignore
             telegram_id (int): The ID of the user to retrieve or create.
 
         Returns:
-            Union[User, int]: The User object corresponding to the specified user ID, or -1 if an error occurs.
+            User: The User object corresponding to the specified user ID
         """
         try:
             user: User
             user, created = User.objects.get_or_create(
                 telegram_id=telegram_id, defaults={"name": f"User {telegram_id}"}
             )
-        except IndexError as e:
-            logger.error(
-                f"Unable to get or create user: {e} because of {type(e).__name__}"
-            )
-            return ErrorCodes.exceptions
+        except IndexError:
+            raise SystemError()
         else:
             if created:
                 logger.info(f"Created new user {user}")

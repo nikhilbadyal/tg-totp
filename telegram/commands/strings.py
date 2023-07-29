@@ -6,3 +6,4 @@ missing_secret_issuer = (
 )
 added_secret = "Added secret."
 duplicate_secret = "Secret already exists."
+user_fetch_failed = "Unable to get user details."
