@@ -12,3 +12,9 @@ class InvalidSecret(ValueError):
     """Invalid Secret."""
 
     pass
+
+
+class FileProcessFail(ValueError):
+    """Invalid Secret."""
+
+    pass

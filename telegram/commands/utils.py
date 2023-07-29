@@ -1,4 +1,5 @@
 """Utility functions."""
+import os
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
@@ -10,7 +11,7 @@ from telethon import events
 from telethon.tl.types import User
 
 from sqlitedb.models import Secret
-from telegram.commands.exceptions import DuplicateSecret, InvalidSecret
+from telegram.commands.exceptions import DuplicateSecret, FileProcessFail, InvalidSecret
 from telegram.commands.strings import (
     added_secret,
     duplicate_secret,
@@ -33,6 +34,7 @@ class SupportedCommands(Enum):
     SETTINGS: str = "/settings"
     GET: str = "/get"
     ADDURI: str = "/adduri"
+    ADDURIFILE: str = "/addurifile"
 
     @classmethod
     def get_values(cls) -> List[str]:
@@ -157,3 +159,56 @@ async def add_secret_data(
         return invalid_secret
     except DuplicateSecret:
         return duplicate_secret
+
+
+async def bulk_add_secret_data(
+    secrets: List[Dict[str, str]], event: events.NewMessage.Event
+) -> List[Dict[str, str]]:
+    """Add secret data."""
+    failed = []
+    for secret_data in secrets:
+        result = await add_secret_data(secret_data, event)
+        if result != added_secret:
+            failed.append(secret_data)
+    return failed
+
+
+async def get_uri_file_from_message(event: events.NewMessage.Event) -> str:
+    """Get file from message."""
+    # Define a prefix for the image URL
+    temp_file = await event.message.download_media()
+    if not temp_file and event.message.is_reply:
+        logger.debug("Checking replied message for file.")
+        replied_msg = await event.message.get_reply_message()
+        temp_file = await replied_msg.download_media()
+    if not temp_file:
+        raise FileNotFoundError()
+    return temp_file  # type: ignore
+
+
+def process_uri_file(temp_file: str) -> List[str]:
+    """Process URI file."""
+    uris = []
+    try:
+        with open(temp_file) as uri_file:
+            for uri in uri_file:
+                uris.append(uri.strip())
+        return uris
+    except Exception:
+        raise FileProcessFail()
+    finally:
+        os.remove(temp_file)
+
+
+def extract_secret_from_uri(uris: List[str]) -> List[Dict[str, str]]:
+    """Extract secrets from URI."""
+    from totp.totp import OTP
+
+    secrets = []
+    try:
+        for uri in uris:
+            secret_data = OTP.parse_uri(uri)
+            secrets.append(secret_data)
+    except InvalidSecret as e:
+        raise FileProcessFail(e)
+    return secrets
