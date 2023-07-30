@@ -22,12 +22,12 @@ async def navigate_pages(event: events.callbackquery.CallbackQuery.Event):
     Args:
         event (CallbackQuery.Event): The callback query event.
     """
-    telegram_id = event.query.user_id
-    action, page = event.data.decode("utf-8").split(":")
+    _, page = event.data.decode("utf-8").split(":")
     page = int(page)
 
     await event.answer()
-    response, buttons = await send_paginated_records(telegram_id, page)
+    user = await get_user(event)
+    response, buttons = await send_paginated_records(user, page)
     await event.edit(response, buttons=buttons, parse_mode="markdown")
 
 
