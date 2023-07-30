@@ -233,7 +233,7 @@ class SecretManager(models.Manager):  # type: ignore
             secret=secret.secret.strip(),
         )
 
-    def clear_secret(self, user: User) -> int:
+    def clear_user_secrets(self, user: User) -> int:
         """Clear all secret for a given user."""
         deleted, _ = self.filter(user=user).delete()
         return deleted
