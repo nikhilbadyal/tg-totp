@@ -2,6 +2,7 @@
 import operator
 from functools import reduce
 from typing import Any, Dict, Tuple
+from urllib.parse import quote
 
 from django.db import models
 from django.db.models import Field, Q
@@ -11,7 +12,7 @@ from manage import init_django
 from sqlitedb.lookups import Like
 from sqlitedb.utils import UserStatus, paginate_queryset
 from telegram.exceptions import DuplicateSecret
-from urllib.parse import quote
+
 init_django()
 
 Field.register_lookup(Like)
@@ -186,6 +187,19 @@ class SecretManager(models.Manager):  # type: ignore
         data = self.filter(user=user)
         size = len(data)
         return data, size
+
+    def total_secrets(self, user: User) -> int:
+        """Return count of all secrets for a given user.
+
+        Args:
+            user (User): User.
+
+        Returns:
+            int:no of records
+        """
+        # Retrieve the conversations for the given user
+        # noinspection PyTypeChecker
+        return self.filter(user=user).count()
 
     def reduced_print(self, secret: "Secret") -> Any:
         """Print Secret with minial details.
