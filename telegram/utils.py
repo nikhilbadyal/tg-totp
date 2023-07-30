@@ -10,13 +10,13 @@ from django.utils.translation import gettext as _
 from loguru import logger
 from telethon import events, types
 from telethon.extensions import markdown
-from telethon.tl.types import User
+from telethon.tl.types import User as TelegramUser
 
-from sqlitedb.models import Secret
+from sqlitedb.models import Secret, User
 from telegram.exceptions import DuplicateSecret, FileProcessFail, InvalidSecret
 from telegram.strings import added_secret, no_input
 
-# Number of conversations per page
+# Number of records per page
 PAGE_SIZE = 10
 
 
@@ -85,7 +85,7 @@ class SupportedCommands(Enum):
         return self.value
 
 
-async def get_user(event: events.NewMessage.Event) -> User:
+async def get_telegram_user(event: events.NewMessage.Event) -> TelegramUser:
     """Get the user associated with a message event in Telegram.
 
     Args:
@@ -96,7 +96,7 @@ async def get_user(event: events.NewMessage.Event) -> User:
     """
     try:
         # Get the user entity from the peer ID of the message event, Uses cache
-        user: User = await event.client.get_entity(event.peer_id)
+        user: TelegramUser = await event.client.get_entity(event.peer_id)
     except (ValueError, AttributeError):
         logger.debug("Invalid Peer ID")
         user = await event.get_sender()
@@ -118,7 +118,7 @@ def get_regex() -> str:
 class UserSettings(Enum):
     """User Settings."""
 
-    PAGE_SIZE = "page_size", "The number of conversations displayed per page."
+    PAGE_SIZE = "page_size", "The number of records displayed per page."
 
     def __new__(cls, *args: Any, **kwds: Any) -> "UserSettings":
         obj = object.__new__(cls)
@@ -248,3 +248,10 @@ def import_failure_output_file(import_failures: Dict[str, List[Dict[str, str]]])
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(import_failures, f, ensure_ascii=False, indent=4)
     return output_file
+
+
+async def get_user(event: events.NewMessage.Event) -> User:
+    """Get out user from telegram user."""
+    telegram_user: TelegramUser = await get_telegram_user(event)
+    user = await sync_to_async(User.objects.get_user)(telegram_user)
+    return user

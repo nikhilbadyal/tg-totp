@@ -3,9 +3,8 @@ from asgiref.sync import sync_to_async
 
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
-from telethon.tl.types import User as TelegramUser
 
-from sqlitedb.models import Secret, User
+from sqlitedb.models import Secret
 from telegram.strings import no_input
 
 # Import some helper functions
@@ -44,8 +43,7 @@ async def handle_rm_message(event: events.NewMessage.Event) -> None:
     except ValueError:
         await event.reply(no_input)
         return
-    telegram_user: TelegramUser = await get_user(event)
-    user = await sync_to_async(User.objects.get_user)(telegram_user.id)
+    user = await get_user(event)
 
     size = await sync_to_async(Secret.objects.rm_user_secret)(
         user=user, secret_id=secret_id

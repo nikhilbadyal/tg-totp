@@ -1,13 +1,9 @@
 """Handle addurifile command."""
 import os
 
-from asgiref.sync import sync_to_async
-
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
-from telethon.tl.types import User as TelegramUser
 
-from sqlitedb.models import User
 from telegram.exceptions import FileProcessFail
 from telegram.strings import file_process_failed, no_input, processing_file
 
@@ -45,8 +41,7 @@ async def handle_addurifile_message(event: events.NewMessage.Event) -> None:
         message = await event.reply(processing_file)
         uris = process_uri_file(uri_file)
         secrets = extract_secret_from_uri(uris)
-        telegram_user: TelegramUser = await get_user(event)
-        user = await sync_to_async(User.objects.get_user)(telegram_user.id)
+        user = await get_user(event)
         import_status, import_failures = await bulk_add_secret_data(secrets, user)
         failed = False
         for fail_type, count in import_status.items():

@@ -3,9 +3,8 @@ from asgiref.sync import sync_to_async
 
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
-from telethon.tl.types import User as TelegramUser
 
-from sqlitedb.models import Secret, User
+from sqlitedb.models import Secret
 
 # Import some helper functions
 from telegram.utils import SupportedCommands, get_user
@@ -27,8 +26,7 @@ async def handle_total_message(event: events.NewMessage.Event) -> None:
     Returns:
         None: This function doesn't return anything.
     """
-    telegram_user: TelegramUser = await get_user(event)
-    user = await sync_to_async(User.objects.get_user)(telegram_user.id)
+    user = await get_user(event)
 
     size = await sync_to_async(Secret.objects.total_secrets)(user=user)
     await event.reply(f"There are {size} secrets in total.")

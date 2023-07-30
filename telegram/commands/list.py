@@ -6,8 +6,7 @@ from loguru import logger
 from telethon import Button, TelegramClient, events
 
 from sqlitedb.models import Secret, User
-from telegram.strings import user_fetch_failed
-from telegram.utils import PAGE_SIZE, SupportedCommands
+from telegram.utils import PAGE_SIZE, SupportedCommands, get_user
 
 
 def add_list_handlers(client: TelegramClient) -> None:
@@ -18,7 +17,7 @@ def add_list_handlers(client: TelegramClient) -> None:
 
 @events.register(events.CallbackQuery(pattern=r"(next|prev)_page:(\d+)"))  # type: ignore
 async def navigate_pages(event: events.callbackquery.CallbackQuery.Event):
-    """Event handler to navigate between pages of conversations.
+    """Event handler to navigate between pages of records.
 
     Args:
         event (CallbackQuery.Event): The callback query event.
@@ -28,28 +27,22 @@ async def navigate_pages(event: events.callbackquery.CallbackQuery.Event):
     page = int(page)
 
     await event.answer()
-    response, buttons = await send_paginated_conversations(telegram_id, page)
+    response, buttons = await send_paginated_records(telegram_id, page)
     await event.edit(response, buttons=buttons, parse_mode="markdown")
 
 
-async def send_paginated_conversations(
-    telegram_id: int, page: int
+async def send_paginated_records(
+    user: User, page: int
 ) -> Tuple[str, List[Button] | None]:
-    """Fetch and send paginated conversations for the given user.
+    """Fetch and send paginated records for the given user.
 
     Args:
-        telegram_id (int): The Telegram ID of the user.
+        user (User): The Telegram ID of the user.
         page (int): The current page number.
 
     Returns:
         Tuple[str, List]: A tuple containing the response message and the list of buttons.
     """
-
-    # Fetch user settings
-    try:
-        user = await sync_to_async(User.objects.get_user)(telegram_id)
-    except SystemError:
-        return user_fetch_failed, []
     user_settings = user.settings
 
     page_size = user_settings.get("page_size", PAGE_SIZE)
@@ -85,8 +78,7 @@ async def handle_list_command(event: events.NewMessage.Event) -> None:
     """
     # Log that a request has been received to delete all user data
     logger.debug("Received request to list all secrets")
-
-    telegram_id = event.message.sender_id
     page = 1
-    response, buttons = await send_paginated_conversations(telegram_id, page)
+    user = await get_user(event)
+    response, buttons = await send_paginated_records(user, page)
     await event.reply(response, buttons=buttons)

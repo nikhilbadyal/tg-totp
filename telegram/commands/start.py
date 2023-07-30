@@ -1,11 +1,7 @@
 """Handle start command."""
-from asgiref.sync import sync_to_async
 
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
-from telethon.tl.types import User as TelegramUser
-
-from sqlitedb.models import User
 
 # Import some helper functions
 from telegram.utils import SupportedCommands, get_user
@@ -28,7 +24,6 @@ async def handle_start_message(event: events.NewMessage.Event) -> None:
         None: This function doesn't return anything.
     """
     # Get the user associated with the message
-    telegram_user: TelegramUser = await get_user(event)
-    await sync_to_async(User.objects.get_user)(telegram_user.id)
-    result = f"Hii👋, {telegram_user.first_name} {telegram_user.last_name}"
+    user = await get_user(event)
+    result = f"Hii👋, {user.name}"
     await event.respond(result)

@@ -4,9 +4,8 @@ from loguru import logger
 
 # Import necessary libraries and modules
 from telethon import Button, TelegramClient, events
-from telethon.tl.types import User as TelegramUser
 
-from sqlitedb.models import Secret, User
+from sqlitedb.models import Secret
 from telegram.strings import ignore
 
 # Import some helper functions
@@ -45,8 +44,7 @@ async def handle_reset_confirm_response(
     await event.answer()
     logger.debug("Received reset callback")
     if event.data == reset_yes_data:
-        telegram_user: TelegramUser = await get_user(event)
-        user = await sync_to_async(User.objects.get_user)(telegram_user.id)
+        user = await get_user(event)
         size = await sync_to_async(Secret.objects.clear_user_secrets)(user=user)
         await event.edit(f"Deleted {size} secrets.")
     elif event.data == reset_no_data:

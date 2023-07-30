@@ -6,7 +6,7 @@ from urllib.parse import quote
 
 from django.db import models
 from django.db.models import Field, Q
-from loguru import logger
+from telethon.tl.types import User as TelegramUser
 
 from manage import init_django
 from sqlitedb.lookups import Like
@@ -21,28 +21,24 @@ Field.register_lookup(Like)
 class UserManager(models.Manager):  # type: ignore
     """Manager for the User model."""
 
-    def get_user(self, telegram_id: int) -> "User":
+    def get_user(self, telegram_user: TelegramUser) -> "User":
         """Retrieve a User object from the database for a given user_id. If the
         user does not exist, create a new user.
 
         Args:
-            telegram_id (int): The ID of the user to retrieve or create.
+            telegram_user (TelegramUser): The ID of the user to retrieve or create.
 
         Returns:
             User: The User object corresponding to the specified user ID
         """
         try:
-            user: User
-            user, created = User.objects.get_or_create(
-                telegram_id=telegram_id, defaults={"name": f"User {telegram_id}"}
+            user: User = self.filter(telegram_id=telegram_user.id).get()
+        except self.model.DoesNotExist:
+            user = User.objects.create(
+                telegram_id=telegram_user.id,
+                **{"name": f"{telegram_user.first_name} {telegram_user.last_name}"},
             )
-        except IndexError:
-            raise SystemError()
-        else:
-            if created:
-                logger.info(f"Created new user {user}")
-            else:
-                logger.info(f"Retrieved existing {user}")
+
         return user
 
 
@@ -132,12 +128,12 @@ class SecretManager(models.Manager):  # type: ignore
         Args:
             user (User): User.
             page (int): The current page number.
-            per_page (int): The number of conversations to display per page.
+            per_page (int): The number of records to display per page.
 
         Returns:
-            dict: A dictionary containing the paginated conversations and pagination details.
+            dict: A dictionary containing the paginated records and pagination details.
         """
-        # Retrieve the conversations for the given user
+        # Retrieve the records for the given user
         data = (
             self.only("id", "issuer", "account_id", "secret", "joining_date")
             .filter(user=user)
@@ -157,7 +153,7 @@ class SecretManager(models.Manager):  # type: ignore
         Returns:
             tuple: Data and the no of records in it
         """
-        # Retrieve the conversations for the given user
+        # Retrieve the records for the given user
         filter_kwargs = {
             "account_id__icontains": secret_filter,
             "issuer__icontains": secret_filter,
@@ -182,7 +178,7 @@ class SecretManager(models.Manager):  # type: ignore
         Returns:
             tuple: Data and the no of records in it
         """
-        # Retrieve the conversations for the given user
+        # Retrieve the records for the given user
         # noinspection PyTypeChecker
         data = self.filter(user=user)
         size = len(data)
@@ -197,7 +193,7 @@ class SecretManager(models.Manager):  # type: ignore
         Returns:
             int:no of records
         """
-        # Retrieve the conversations for the given user
+        # Retrieve the records for the given user
         # noinspection PyTypeChecker
         return self.filter(user=user).count()
 

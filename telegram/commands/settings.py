@@ -1,13 +1,11 @@
 """Settings command."""
 
-from asgiref.sync import sync_to_async
 from loguru import logger
 from telethon import Button, TelegramClient, events
 
-from sqlitedb.models import User
 from telegram.strings import invalid_setting, user_fetch_failed
 from telegram.user_settings import modify_page_size
-from telegram.utils import SupportedCommands, UserSettings
+from telegram.utils import SupportedCommands, UserSettings, get_user
 
 
 def add_settings_handlers(client: TelegramClient) -> None:
@@ -47,9 +45,8 @@ async def handle_settings_current_settings(
     await event.answer()
 
     response = "**Current settings**:\n\n"
-    telegram_id = event.query.user_id
     try:
-        user = await sync_to_async(User.objects.get_user)(telegram_id)
+        user = await get_user(event)
         settings = user.settings
         for setting in settings:
             setting_enum = UserSettings(setting)
@@ -90,8 +87,7 @@ async def handle_settings_command(event: events.NewMessage.Event) -> None:
     new_value = parts[2]
     logger.debug(f"Received request to modify {setting_name} settings to {new_value}")
 
-    telegram_id = event.message.sender_id
-    user = await sync_to_async(User.objects.get_user)(telegram_id)
+    user = await get_user(event)
     user_settings = user.settings
 
     settings_modification_functions = {
