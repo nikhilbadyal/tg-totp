@@ -13,3 +13,4 @@ reports
 userlist.txt
 pgbouncer.ini
 output*.json
+export*.txt
