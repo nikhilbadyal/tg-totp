@@ -48,7 +48,7 @@ async def handle_reset_confirm_response(
         telegram_user: TelegramUser = await get_user(event)
         user = await sync_to_async(User.objects.get_user)(telegram_user.id)
         size = await sync_to_async(Secret.objects.clear_user_secrets)(user=user)
-        await event.reply(f"Deleted {size} secrets.")
+        await event.edit(f"Deleted {size} secrets.")
     elif event.data == reset_no_data:
         await event.edit(ignore)
 
