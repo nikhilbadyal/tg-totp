@@ -98,7 +98,7 @@ async def get_telegram_user(event: events.NewMessage.Event) -> TelegramUser:
         # Get the user entity from the peer ID of the message event, Uses cache
         user: TelegramUser = await event.client.get_entity(event.peer_id)
     except (ValueError, AttributeError):
-        logger.debug("Invalid Peer ID")
+        logger.debug("Couldn't get user from cache. Invalid Peer ID")
         user = await event.get_sender()
     return user
 
