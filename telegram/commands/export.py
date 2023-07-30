@@ -1,4 +1,5 @@
 """Handle export command."""
+from datetime import datetime
 import os
 
 from asgiref.sync import sync_to_async
@@ -35,7 +36,7 @@ async def handle_export_message(event: events.NewMessage.Event) -> None:
     uris = []
     for secret in data:
         uris.append(Secret.objects.export_print(secret))
-    output_file = "export.txt"
+    output_file = f"export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
     with open(output_file, "w", encoding="utf-8") as file:
         file.write("\n".join(uris))
     await event.reply(message=f"Exported {size} URIs.", file=output_file)
