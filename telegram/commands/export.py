@@ -9,6 +9,7 @@ from telethon import TelegramClient, events
 from telethon.tl.types import User as TelegramUser
 
 from sqlitedb.models import Secret, User
+from telegram.strings import no_export
 
 # Import some helper functions
 from telegram.utils import SupportedCommands, get_user
@@ -33,14 +34,17 @@ async def handle_export_message(event: events.NewMessage.Event) -> None:
     telegram_user: TelegramUser = await get_user(event)
     user = await sync_to_async(User.objects.get_user)(telegram_user.id)
     data, size = await sync_to_async(Secret.objects.export_secrets)(user=user)
-    uris = []
-    for secret in data:
-        uris.append(Secret.objects.export_print(secret))
-    output_file = f"export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-    with open(output_file, "w", encoding="utf-8") as file:
-        file.write("\n".join(uris))
-    await event.reply(message=f"Exported {size} URIs.", file=output_file)
-    try:
-        os.remove(output_file)
-    except FileNotFoundError:
-        pass
+    if size == 0:
+        await event.reply(message=no_export)
+    else:
+        uris = []
+        for secret in data:
+            uris.append(Secret.objects.export_print(secret))
+        output_file = f"export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+        with open(output_file, "w", encoding="utf-8") as file:
+            file.write("\n".join(uris))
+        await event.reply(message=f"Exported {size} URIs.", file=output_file)
+        try:
+            os.remove(output_file)
+        except FileNotFoundError:
+            pass
