@@ -209,10 +209,11 @@ class SecretManager(models.Manager):  # type: ignore
         """
         from totp.totp import OTP
 
-        return "`{otp}` is OTP for account **{account}** issued by **{issuer}**".format(
+        return "`{otp}` is OTP for account **{account}** issued by **{issuer}**(ID - `{id}`)".format(
             otp=OTP.now(secret=secret.secret),
             account=secret.account_id,
             issuer=secret.issuer,
+            id=secret.id,
         )
 
     def export_print(self, secret: "Secret") -> Any:
@@ -236,6 +237,11 @@ class SecretManager(models.Manager):  # type: ignore
     def clear_user_secrets(self, user: User) -> int:
         """Clear all secret for a given user."""
         deleted, _ = self.filter(user=user).delete()
+        return deleted
+
+    def rm_user_secret(self, user: User, secret_id: int) -> int:
+        """Clear secret with given id."""
+        deleted, _ = self.filter(user=user, id=secret_id).delete()
         return deleted
 
 
@@ -285,6 +291,9 @@ class Secret(models.Model):
     def __str__(self) -> str:
         """Return a string representation of the user object."""
         return (
-            f"Secret [{self.secret}](spoiler) issued by {self.issuer} for {self.account_id} added on"
-            f" {self.joining_date.strftime('%b %d, %Y %I:%M:%S %p')}"
+            f"Secret [{self.secret}](spoiler) "
+            f"with ID `{self.id}` "
+            f"issued by **{self.issuer}** "
+            f"for account **{self.account_id}** "
+            f"added on **{self.joining_date.strftime('%b %d, %Y %I:%M:%S %p')}**"
         )

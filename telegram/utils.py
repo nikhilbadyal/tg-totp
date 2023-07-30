@@ -65,6 +65,7 @@ class SupportedCommands(Enum):
     EXPORT: str = "/export"
     RESET: str = "/reset"
     TOTAL: str = "/total"
+    RM: str = "/rm"
 
     @classmethod
     def get_values(cls) -> List[str]:
