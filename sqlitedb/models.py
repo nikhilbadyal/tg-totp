@@ -11,7 +11,7 @@ from manage import init_django
 from sqlitedb.lookups import Like
 from sqlitedb.utils import UserStatus, paginate_queryset
 from telegram.exceptions import DuplicateSecret
-
+from urllib.parse import quote
 init_django()
 
 Field.register_lookup(Like)
@@ -211,8 +211,8 @@ class SecretManager(models.Manager):  # type: ignore
             "otpauth://totp/{issuer}%3A{account}?period={period}&digits={digits}&"
             "algorithm={algorithm}&secret={secret}&issuer={issuer}"
         ).format(
-            issuer=secret.issuer.strip(),
-            account=secret.account_id.strip(),
+            issuer=quote(secret.issuer.strip()),
+            account=quote(secret.account_id.strip()),
             period=secret.period,
             digits=secret.digits,
             algorithm=secret.algorithm.strip(),
