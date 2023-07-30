@@ -4,7 +4,7 @@ from functools import reduce
 from typing import Any, Dict, Tuple
 from urllib.parse import quote
 
-from django.db import models
+from django.db import IntegrityError, models
 from django.db.models import Field, Q
 from telethon.tl.types import User as TelegramUser
 
@@ -105,10 +105,10 @@ class SecretManager(models.Manager):  # type: ignore
 
     def create_secret(self, user: User, **kwargs: Any) -> "Secret":
         """Add secret."""
-        if self.filter(user=user, secret=kwargs["secret"]).exists():
+        try:
+            return self.create(user=user, **kwargs)  # type: ignore
+        except IntegrityError:
             raise DuplicateSecret()
-        secret = self.create(user=user, **kwargs)
-        return secret  # type: ignore
 
     def possible_inputs(self) -> Dict[str, str]:
         """Possible input."""
