@@ -46,7 +46,7 @@ def paginate_queryset(
     except EmptyPage:
         logger.debug(f"Empty {page} current page")
         paginated_data = paginator.page(paginator.num_pages)
-    #Don't remove this. It is to force evaluate the queryset
+    # Don't remove this. It is to force evaluate the queryset
     logger.info(f"Got {len(paginated_data)} records")
     return {
         "data": paginated_data,
