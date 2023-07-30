@@ -63,6 +63,7 @@ class SupportedCommands(Enum):
     ADDURI: str = "/adduri"
     ADDURIFILE: str = "/addurifile"
     EXPORT: str = "/export"
+    RESET: str = "/reset"
 
     @classmethod
     def get_values(cls) -> List[str]:
