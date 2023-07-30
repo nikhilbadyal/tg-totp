@@ -46,7 +46,7 @@ async def handle_get_message(event: events.NewMessage.Event) -> None:
     if size > 0:
         response = f"Here are the TOTP for **{size}** found secrets.\n\n"
         for secret in data:
-            response += f"{Secret.objects.reduced_print(secret)}\n"
+            response += f"➡️ {Secret.objects.reduced_print(secret)}\n"
         await event.reply(response)
     else:
         await event.reply(no_result)

@@ -1,4 +1,5 @@
 """TOTP generator."""
+import datetime
 import traceback
 from typing import Dict
 
@@ -15,11 +16,17 @@ class OTP(object):
     """Base class for OTP handlers."""
 
     @staticmethod
-    def now(secret: str) -> str:
+    def now(secret: str) -> tuple[str, datetime.datetime]:
         """Generate TOTP."""
         try:
             is_valid_2fa_secret(secret)
-            return str(pyotp.TOTP(secret).now())
+            totp = pyotp.TOTP(secret)
+            otp = str(totp.now())
+            curr_time = datetime.datetime.now()
+            time_remaining = datetime.timedelta(
+                seconds=int(totp.interval - curr_time.timestamp() % totp.interval)
+            )
+            return otp, curr_time + time_remaining
         except InvalidSecret:
             totp = invalid_secret
         except ValueError:
@@ -29,7 +36,7 @@ class OTP(object):
             totp = invalid_secret
             logger.error(f"Failed to generate TOTP for {secret}")
             traceback.print_exception(exc)
-        return totp
+        return str(totp), datetime.datetime.now()
 
     @staticmethod
     def parse_uri(secret_uri: str) -> Dict[str, str]:
