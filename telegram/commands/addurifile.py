@@ -48,10 +48,15 @@ async def handle_addurifile_message(event: events.NewMessage.Event) -> None:
         telegram_user: TelegramUser = await get_user(event)
         user = await sync_to_async(User.objects.get_user)(telegram_user.id)
         import_status, import_failures = await bulk_add_secret_data(secrets, user)
-        output_file = import_failure_output_file(import_failures)
+        failed = False
+        for fail_type, count in import_status.items():
+            if fail_type != "success" and count > 0:
+                failed = True
         await message.edit(f"Done processing with status `{import_status}`")
-        await event.respond(file=output_file)
-        os.remove(output_file)
+        if failed:
+            output_file = import_failure_output_file(import_failures)
+            await event.respond(file=output_file)
+            os.remove(output_file)
     except FileNotFoundError:
         await event.reply(no_input)
     except FileProcessFail as e:
