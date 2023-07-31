@@ -71,7 +71,7 @@ async def send_paginated_records(
         extra.append(Button.inline("Last Page", data=f"next_page:{last_page}"))
     buttons.append(extra)
 
-    if not buttons:
+    if not buttons[0]:
         buttons = None  # type: ignore
 
     return response, buttons
@@ -85,7 +85,6 @@ async def handle_list_command(event: events.NewMessage.Event) -> None:
     Args:
         event (NewMessage.Event): The new message event.
     """
-    # Log that a request has been received to delete all user data
     logger.debug("Received request to list all secrets")
     page = 1
     user = await get_user(event)
