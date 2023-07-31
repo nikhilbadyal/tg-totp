@@ -43,7 +43,7 @@ async def handle_addurifile_message(event: events.NewMessage.Event) -> None:
         parsed_secret, parse_failed = extract_secret_from_uri(uris)
         user = await get_user(event)
         import_status, failed_secrets = await bulk_add_secret_data(parsed_secret, user)
-        import_status["invalid"] = len(parse_failed)
+        import_status["invalid"] = len(parse_failed["invalid"])
         failed_secrets["invalid"] = parse_failed["invalid"]
         was_failed = False
         if len(parse_failed["invalid"]) > 0:
