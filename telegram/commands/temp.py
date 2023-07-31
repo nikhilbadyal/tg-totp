@@ -2,7 +2,8 @@
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
 
-from telegram.strings import no_input
+from telegram.exceptions import InvalidSecret
+from telegram.strings import invalid_secret, no_input
 
 # Import some helper functions
 from telegram.utils import SupportedCommands
@@ -15,7 +16,7 @@ def add_temp_handlers(client: TelegramClient) -> None:
 
 
 # Register the function to handle the /temp command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.TEMP.value}"))  # type: ignore
+@events.register(events.NewMessage(pattern=rf"^{SupportedCommands.TEMP.value} (\w+)"))  # type: ignore
 async def handle_temp_message(event: events.NewMessage.Event) -> None:
     """Handle /temp command.
 
@@ -25,16 +26,19 @@ async def handle_temp_message(event: events.NewMessage.Event) -> None:
     Returns:
         None: This function doesn't return anything.
     """
-    # Define a prefix for the image URL
-    prefix = f"{SupportedCommands.TEMP.value}"
-    # Pad by 1 to consider the space after command
-    prefix = prefix.ljust(len(prefix) + 1)
-
-    # Extract the image query from the message text
-    prefix_len = len(prefix)
-    totp = event.message.text[prefix_len:]
-    if totp:
-        await event.respond(OTP.now(secret=totp))
+    try:
+        totp = event.pattern_match.group(1)
+        otp, valid_till, time_left = OTP.now(secret=totp)
+        response = (
+            "`{otp}` is OTP. Valid for {time_left} sec till **{valid_till}**"
+        ).format(
+            otp=otp,
+            time_left=time_left,
+            valid_till=valid_till.strftime("%b %d, %Y %I:%M:%S %p"),
+        )
+        await event.respond(response)
+    except InvalidSecret:
+        await event.respond(invalid_secret)
     else:
         # Send an error message if no input was provided
         await event.respond(no_input)
