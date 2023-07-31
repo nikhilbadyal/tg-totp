@@ -205,16 +205,17 @@ class SecretManager(models.Manager):  # type: ignore
         """
         from totp.totp import OTP
 
-        otp, valid_till = OTP.now(secret=secret.secret)
+        otp, valid_till, time_left = OTP.now(secret=secret.secret)
 
         return (
             "`{otp}` is OTP for account **{account}** issued by **{issuer}**.(ID - `{id}`)."
-            "Valid till **{valid_till}**"
+            "Valid for {time_left} sec till **{valid_till}**"
         ).format(
             otp=otp,
             account=secret.account_id,
             issuer=secret.issuer,
             id=secret.id,
+            time_left=time_left,
             valid_till=valid_till.strftime("%b %d, %Y %I:%M:%S %p"),
         )
 
