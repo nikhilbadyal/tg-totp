@@ -17,7 +17,7 @@ def add_adduri_handlers(client: TelegramClient) -> None:
 
 
 # Register the function to handle the /adduri command
-@events.register(events.NewMessage(pattern=rf"^{SupportedCommands.ADDURI.value}(?!file) (\w+)"))  # type: ignore
+@events.register(events.NewMessage(pattern=rf"^{SupportedCommands.ADDURI.value}(?!file)(.*)"))  # type: ignore
 async def handle_adduri_message(event: events.NewMessage.Event) -> None:
     """Handle /adduri command.
 
@@ -27,7 +27,7 @@ async def handle_adduri_message(event: events.NewMessage.Event) -> None:
     Returns:
         None: This function doesn't return anything.
     """
-    secret_data = event.pattern_match.group(1)
+    secret_data = event.pattern_match.group(1).strip()
     try:
         secret_data = OTP.parse_uri(secret_data)
         user = await get_user(event)

@@ -28,7 +28,7 @@ async def handle_get_message(event: events.NewMessage.Event) -> None:
         None: This function doesn't return anything.
     """
     try:
-        data = event.pattern_match.group(1)
+        data = event.pattern_match.group(1).strip()
         if not data:
             raise ValueError()
         user = await get_user(event)

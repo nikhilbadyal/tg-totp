@@ -28,7 +28,7 @@ async def handle_rm_message(event: events.NewMessage.Event) -> None:
         None: This function doesn't return anything.
     """
     try:
-        data = event.pattern_match.group(1)
+        data = event.pattern_match.group(1).strip()
         if not data:
             raise ValueError()
         secret_id = int(data)
