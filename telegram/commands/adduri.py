@@ -17,7 +17,7 @@ def add_adduri_handlers(client: TelegramClient) -> None:
 
 
 # Register the function to handle the /adduri command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.ADDURI.value}(?!file)"))  # type: ignore
+@events.register(events.NewMessage(pattern=fr"^{SupportedCommands.ADDURI.value}(?!file) (\w+)"))  # type: ignore
 async def handle_adduri_message(event: events.NewMessage.Event) -> None:
     """Handle /adduri command.
 
@@ -27,14 +27,7 @@ async def handle_adduri_message(event: events.NewMessage.Event) -> None:
     Returns:
         None: This function doesn't return anything.
     """
-    # Define a prefix for the image URL
-    prefix = f"{SupportedCommands.ADDURI.value}"
-    # Pad by 1 to consider the space after command
-    prefix = prefix.ljust(len(prefix) + 1)
-
-    # Extract the image query from the message text
-    prefix_len = len(prefix)
-    secret_data = event.message.text[prefix_len:]
+    secret_data = event.pattern_match.group(1)
     try:
         secret_data = OTP.parse_uri(secret_data)
         user = await get_user(event)
