@@ -25,7 +25,7 @@ def add_addurifile_handlers(client: TelegramClient) -> None:
 
 
 # Register the function to handle the /addurifile command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.ADDURIFILE.value}"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.ADDURIFILE.value}$"))  # type: ignore
 async def handle_addurifile_message(event: events.NewMessage.Event) -> None:
     """Handle /addurifile command.
 

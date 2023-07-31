@@ -17,7 +17,7 @@ def add_get_handlers(client: TelegramClient) -> None:
 
 
 # Register the function to handle the /get command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.GET.value}"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.GET.value}(.*)"))  # type: ignore
 async def handle_get_message(event: events.NewMessage.Event) -> None:
     """Handle /get command.
 
@@ -27,26 +27,21 @@ async def handle_get_message(event: events.NewMessage.Event) -> None:
     Returns:
         None: This function doesn't return anything.
     """
-    # Define a prefix for the image URL
-    prefix = f"{SupportedCommands.GET.value}"
-    # Pad by 1 to consider the space after command
-    prefix = prefix.ljust(len(prefix) + 1)
+    try:
+        data = event.pattern_match.group(1)
+        if not data:
+            raise ValueError()
+        user = await get_user(event)
 
-    # Extract the image query from the message text
-    prefix_len = len(prefix)
-    secret_filter = event.message.text[prefix_len:]
-    if not secret_filter:
+        data, size = await sync_to_async(Secret.objects.get_secret)(
+            user=user, secret_filter=data
+        )
+        if size > 0:
+            response = f"Here are the TOTP for **{size}** found secrets.\n\n"
+            for secret in data:
+                response += f"➡️ {Secret.objects.reduced_print(secret)}\n"
+            await event.reply(response)
+        else:
+            await event.reply(no_result)
+    except ValueError:
         await event.reply(no_input)
-        return
-    user = await get_user(event)
-
-    data, size = await sync_to_async(Secret.objects.get_secret)(
-        user=user, secret_filter=secret_filter
-    )
-    if size > 0:
-        response = f"Here are the TOTP for **{size}** found secrets.\n\n"
-        for secret in data:
-            response += f"➡️ {Secret.objects.reduced_print(secret)}\n"
-        await event.reply(response)
-    else:
-        await event.reply(no_result)

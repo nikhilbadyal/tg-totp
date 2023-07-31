@@ -16,7 +16,7 @@ def add_temp_handlers(client: TelegramClient) -> None:
 
 
 # Register the function to handle the /temp command
-@events.register(events.NewMessage(pattern=rf"^{SupportedCommands.TEMP.value} (\w+)"))  # type: ignore
+@events.register(events.NewMessage(pattern=rf"^{SupportedCommands.TEMP.value}(\w*)"))  # type: ignore
 async def handle_temp_message(event: events.NewMessage.Event) -> None:
     """Handle /temp command.
 
@@ -27,8 +27,10 @@ async def handle_temp_message(event: events.NewMessage.Event) -> None:
         None: This function doesn't return anything.
     """
     try:
-        totp = event.pattern_match.group(1)
-        otp, valid_till, time_left = OTP.now(secret=totp)
+        data = event.pattern_match.group(1)
+        if not data:
+            raise ValueError()
+        otp, valid_till, time_left = OTP.now(secret=data)
         response = (
             "`{otp}` is OTP. Valid for {time_left} sec till **{valid_till}**"
         ).format(
@@ -39,6 +41,6 @@ async def handle_temp_message(event: events.NewMessage.Event) -> None:
         await event.respond(response)
     except InvalidSecret:
         await event.respond(invalid_secret)
-    else:
+    except ValueError:
         # Send an error message if no input was provided
         await event.respond(no_input)

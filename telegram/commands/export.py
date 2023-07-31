@@ -20,7 +20,7 @@ def add_export_handlers(client: TelegramClient) -> None:
 
 
 # Register the function to handle the /export command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.EXPORT.value}"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.EXPORT.value}$"))  # type: ignore
 async def handle_export_message(event: events.NewMessage.Event) -> None:
     """Handle /export command.
 

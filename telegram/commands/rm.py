@@ -17,7 +17,7 @@ def add_rm_handlers(client: TelegramClient) -> None:
 
 
 # Register the function to handle the /rm command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.RM.value}"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.RM.value}(.*)"))  # type: ignore
 async def handle_rm_message(event: events.NewMessage.Event) -> None:
     """Handle /rm command.
 
@@ -27,25 +27,15 @@ async def handle_rm_message(event: events.NewMessage.Event) -> None:
     Returns:
         None: This function doesn't return anything.
     """
-    # Define a prefix for the image URL
-    prefix = f"{SupportedCommands.RM.value}"
-    # Pad by 1 to consider the space after command
-    prefix = prefix.ljust(len(prefix) + 1)
-
-    # Extract the image query from the message text
-    prefix_len = len(prefix)
-    secret_id = event.message.text[prefix_len:]
-    if not secret_id:
-        await event.reply(no_input)
-        return
     try:
-        secret_id = int(secret_id)
+        data = event.pattern_match.group(1)
+        if not data:
+            raise ValueError()
+        secret_id = int(data)
+        user = await get_user(event)
+        size = await sync_to_async(Secret.objects.rm_user_secret)(
+            user=user, secret_id=secret_id
+        )
+        await event.reply(f"Delete {size} secret.")
     except ValueError:
         await event.reply(no_input)
-        return
-    user = await get_user(event)
-
-    size = await sync_to_async(Secret.objects.rm_user_secret)(
-        user=user, secret_id=secret_id
-    )
-    await event.reply(f"Delete {size} secret.")

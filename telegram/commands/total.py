@@ -16,7 +16,7 @@ def add_total_handlers(client: TelegramClient) -> None:
 
 
 # Register the function to handle the /total command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.TOTAL.value}"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.TOTAL.value}$"))  # type: ignore
 async def handle_total_message(event: events.NewMessage.Event) -> None:
     """Handle /total command.
 
@@ -27,6 +27,5 @@ async def handle_total_message(event: events.NewMessage.Event) -> None:
         None: This function doesn't return anything.
     """
     user = await get_user(event)
-
     size = await sync_to_async(Secret.objects.total_secrets)(user=user)
     await event.reply(f"There are {size} secrets in total.")
