@@ -22,7 +22,11 @@ repos:
       - id: requirements-txt-fixer
       - id: trailing-whitespace
 
-
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: 'v0.0.262'
+    hooks:
+      - id: ruff
+        args: [ --fix ]
 
   - repo: https://github.com/psf/black
     rev: 23.3.0
@@ -62,11 +66,6 @@ repos:
           - '--config=setup.cfg'
         additional_dependencies: [ openai,types-requests,django-stubs, pytest-mypy-plugins,pytest-stub,watchdog]
 
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: 'v0.0.262'
-    hooks:
-      - id: ruff
-        args: [--fix]
 
   - repo: https://github.com/PyCQA/bandit
     rev: '1.7.5'
