@@ -33,7 +33,7 @@ async def navigate_pages(event: events.callbackquery.CallbackQuery.Event):
 
 async def send_paginated_records(
     user: User, page: int
-) -> Tuple[str, List[Button] | None]:
+) -> Tuple[str, List[List[Button]] | None]:
     """Fetch and send paginated records for the given user.
 
     Args:
@@ -56,11 +56,20 @@ async def send_paginated_records(
     response += f"\nPage {result['current_page']} of {result['total_pages']}"
     response += f"\n[Total records {result['total_data']}](spoiler)"
 
-    buttons: List[Button] = []
+    buttons: List[List[Button]] = []
+    main_button = []
     if result["has_previous"]:
-        buttons.append(Button.inline("Previous", data=f"prev_page:{page - 1}"))
+        main_button.append(Button.inline("Previous", data=f"prev_page:{page - 1}"))
     if result["has_next"]:
-        buttons.append(Button.inline("Next", data=f"next_page:{page + 1}"))
+        main_button.append(Button.inline("Next", data=f"next_page:{page + 1}"))
+    buttons.append(main_button)
+    extra = []
+    if page != 1:
+        extra.append(Button.inline("First Page", data="next_page:1"))
+    if page != result["total_pages"]:
+        last_page = result["total_pages"]
+        extra.append(Button.inline("Last Page", data=f"next_page:{last_page}"))
+    buttons.append(extra)
 
     if not buttons:
         buttons = None  # type: ignore
