@@ -40,16 +40,21 @@ async def handle_addurifile_message(event: events.NewMessage.Event) -> None:
         uri_file = await get_uri_file_from_message(event)
         message = await event.reply(processing_file)
         uris = process_uri_file(uri_file)
-        secrets = extract_secret_from_uri(uris)
+        parsed_secret, parse_failed = extract_secret_from_uri(uris)
         user = await get_user(event)
-        import_status, import_failures = await bulk_add_secret_data(secrets, user)
-        failed = False
-        for fail_type, count in import_status.items():
-            if fail_type != "success" and count > 0:
-                failed = True
+        import_status, failed_secrets = await bulk_add_secret_data(parsed_secret, user)
+        import_status["invalid"] = len(parse_failed)
+        failed_secrets["invalid"] = parse_failed["invalid"]
+        was_failed = False
+        if len(parse_failed["invalid"]) > 0:
+            was_failed = True
+        else:
+            for fail_type, count in import_status.items():
+                if fail_type != "success" and count > 0:
+                    was_failed = True
         await message.edit(f"Done processing with status `{import_status}`")
-        if failed:
-            output_file = import_failure_output_file(import_failures)
+        if was_failed:
+            output_file = import_failure_output_file(failed_secrets)
             await event.respond(file=output_file)
             os.remove(output_file)
     except FileNotFoundError:

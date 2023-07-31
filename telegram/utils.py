@@ -186,19 +186,16 @@ async def bulk_add_secret_data(
     secrets: List[Dict[str, str]], user: User
 ) -> Tuple[Dict[str, int], Dict[str, List[Dict[str, str]]]]:
     """Add secret data."""
-    status = {"invalid": 0, "duplicate": 0, "success": 0}
+    import_status = {"invalid": 0, "duplicate": 0, "success": 0}
     failed_secrets: Dict[str, List[Dict[str, str]]] = {"invalid": [], "duplicate": []}
     for secret_data in secrets:
         try:
             await add_secret_data(secret_data, user)
-            status["success"] += 1
-        except InvalidSecret:
-            status["invalid"] += 1
-            failed_secrets["invalid"].append(secret_data)
+            import_status["success"] += 1
         except DuplicateSecret:
-            status["duplicate"] += 1
+            import_status["duplicate"] += 1
             failed_secrets["duplicate"].append(secret_data)
-    return status, failed_secrets
+    return import_status, failed_secrets
 
 
 async def get_uri_file_from_message(event: events.NewMessage.Event) -> str:
@@ -228,18 +225,21 @@ def process_uri_file(temp_file: str) -> List[str]:
         os.remove(temp_file)
 
 
-def extract_secret_from_uri(uris: List[str]) -> List[Dict[str, str]]:
+def extract_secret_from_uri(
+    uris: List[str],
+) -> Tuple[List[Dict[str, str]], Dict[str, List[Dict[str, str]]]]:
     """Extract secrets from URI."""
     from totp.totp import OTP
 
     secrets = []
+    failed: Dict[str, List[Dict[str, str]]] = {"invalid": []}
     for uri in uris:
         try:
             secret_data = OTP.parse_uri(uri)
             secrets.append(secret_data)
-        except InvalidSecret:
-            raise FileProcessFail(uri)
-    return secrets
+        except InvalidSecret as e:
+            failed["invalid"].append({"uri": uri, "reason": str(e)})
+    return secrets, failed
 
 
 def import_failure_output_file(import_failures: Dict[str, List[Dict[str, str]]]) -> str:

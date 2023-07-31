@@ -48,6 +48,5 @@ class OTP(object):
                 if getattr(otp, data, None):
                     secret_data.update({my_data: str(getattr(otp, data))})
             return secret_data
-        except ValueError:
-            logger.error(f"Failed to parse {secret_uri}")
-            raise InvalidSecret()
+        except ValueError as e:
+            raise InvalidSecret(e)
