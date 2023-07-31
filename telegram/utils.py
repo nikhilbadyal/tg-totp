@@ -246,7 +246,7 @@ def import_failure_output_file(import_failures: Dict[str, List[Dict[str, str]]])
     """Prepare failed record file."""
     output_file = "output-data.json"
     with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(import_failures, f, ensure_ascii=False, indent=4)
+        json.dump(import_failures, f, ensure_ascii=False, indent=2)
     return output_file
 
 
