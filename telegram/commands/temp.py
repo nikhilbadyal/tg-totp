@@ -38,9 +38,9 @@ async def handle_temp_message(event: events.NewMessage.Event) -> None:
             time_left=time_left,
             valid_till=valid_till.strftime("%b %d, %Y %I:%M:%S %p"),
         )
-        await event.respond(response)
+        await event.reply(response)
     except InvalidSecret:
-        await event.respond(invalid_secret)
+        await event.reply(invalid_secret)
     except ValueError:
         # Send an error message if no input was provided
-        await event.respond(no_input)
+        await event.reply(no_input)

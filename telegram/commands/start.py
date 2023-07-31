@@ -26,4 +26,4 @@ async def handle_start_message(event: events.NewMessage.Event) -> None:
     # Get the user associated with the message
     user = await get_user(event)
     result = f"Hii👋, {user.name}"
-    await event.respond(result)
+    await event.reply(result)

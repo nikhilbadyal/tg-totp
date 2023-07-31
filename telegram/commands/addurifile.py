@@ -55,7 +55,7 @@ async def handle_addurifile_message(event: events.NewMessage.Event) -> None:
         await message.edit(f"Done processing with status `{import_status}`")
         if was_failed:
             output_file = import_failure_output_file(failed_secrets)
-            await event.respond(file=output_file)
+            await event.reply(file=output_file)
             os.remove(output_file)
     except FileNotFoundError:
         await event.reply(no_input)
