@@ -111,7 +111,7 @@ def get_regex() -> str:
         str: A regex pattern as a string.
     """
     # Exclude any message that starts with one of the supported commands using negative lookahead
-    pattern = r"^(?!(%s))[^/].*" % "|".join(SupportedCommands.get_values())
+    pattern = r"^(?!(%s))[/].*" % "|".join(SupportedCommands.get_values())
     return pattern
 
 
