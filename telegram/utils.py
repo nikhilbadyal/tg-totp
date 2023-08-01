@@ -261,8 +261,11 @@ async def get_user(event: events.NewMessage.Event) -> User:
 
 def or_filters(filters: Dict[str, Any]) -> List[Any]:
     """Prepare queryset fileter from dict."""
-    filtered_or = [Q(**{key: val}) for key, val in filters.items()]
-    return reduce(operator.or_, filtered_or)  # type: ignore
+    try:
+        filtered_or = [Q(**{key: val}) for key, val in filters.items()]
+        return reduce(operator.or_, filtered_or)  # type: ignore
+    except TypeError:
+        return []
 
 
 def prepare_user_filter(user: User) -> Dict[str, Any]:

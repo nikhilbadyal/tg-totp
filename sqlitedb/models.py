@@ -182,7 +182,9 @@ class SecretManager(models.Manager):  # type: ignore
         try:
             user_filter = prepare_user_filter(user)
             combined_filter = or_filters(secret_filter)
-            data = self.filter(**user_filter).filter(combined_filter)
+            data = self.filter(**user_filter)
+            if combined_filter:
+                data = data.filter(combined_filter)
             result = []
             async for e in data:
                 result.append(e)
