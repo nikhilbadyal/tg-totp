@@ -137,7 +137,7 @@ class SecretManager(models.Manager):  # type: ignore
         combined_filter = or_filters(user_filter)
         data = (
             self.only("id", "issuer", "account_id", "secret", "joining_date")
-            .filter(*combined_filter)
+            .filter(combined_filter)
             .order_by("-last_updated")
         )
 
