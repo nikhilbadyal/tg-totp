@@ -49,7 +49,7 @@ class MyHandler(FileSystemEventHandler):
 
 if __name__ == "__main__":
     included_directories: str = "."
-    excluded_directories = ["migrations"]
+    excluded_directories = ["migrations", "venv"]
 
     # Initialize the event handler with the excluded_directories list
     event_handler = MyHandler(excluded_directories)
