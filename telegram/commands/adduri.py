@@ -27,9 +27,11 @@ async def handle_adduri_message(event: events.NewMessage.Event) -> None:
     Returns:
         None: This function doesn't return anything.
     """
-    secret_data = event.pattern_match.group(1).strip()
     try:
-        secret_data = OTP.parse_uri(secret_data)
+        data = event.pattern_match.group(1).strip()
+        if not data:
+            raise ValueError()
+        secret_data = OTP.parse_uri(data)
         user = await get_user(event)
         response = await add_secret_data(secret_data, user)
         await event.reply(response)
