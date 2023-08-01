@@ -1,7 +1,9 @@
 """Utility functions."""
 import json
+import operator
 import os
 from enum import Enum
+from functools import reduce
 from typing import Any, Dict, List, Optional, Tuple
 
 import pyotp
@@ -257,13 +259,10 @@ async def get_user(event: events.NewMessage.Event) -> User:
     return user
 
 
-def prepare_filter(filters: Dict[str, Any]) -> List[Q]:
+def or_filters(filters: Dict[str, Any]) -> List[Any]:
     """Prepare queryset fileter from dict."""
-    updated_filter = []
-    for k, v in filters.items():
-        if v:
-            updated_filter.append(Q(**{k: v}))
-    return updated_filter
+    filtered_or = [Q(**{key: val}) for key, val in filters.items()]
+    return reduce(operator.or_, filtered_or)  # type: ignore
 
 
 def prepare_user_filter(user: User) -> Dict[str, Any]:

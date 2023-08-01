@@ -1,11 +1,9 @@
 """Models."""
-import operator
-from functools import reduce
 from typing import Any, Dict, Tuple
 from urllib.parse import quote
 
 from django.db import IntegrityError, models
-from django.db.models import Field, Q
+from django.db.models import Field
 from telethon.tl.types import User as TelegramUser
 
 from manage import init_django
@@ -133,10 +131,13 @@ class SecretManager(models.Manager):  # type: ignore
         Returns:
             dict: A dictionary containing the paginated records and pagination details.
         """
-        # Retrieve the records for the given user
+        from telegram.utils import or_filters, prepare_user_filter
+
+        user_filter = prepare_user_filter(user)
+        combined_filter = or_filters(user_filter)
         data = (
             self.only("id", "issuer", "account_id", "secret", "joining_date")
-            .filter(user=user)
+            .filter(*combined_filter)
             .order_by("-last_updated")
         )
 
@@ -159,18 +160,7 @@ class SecretManager(models.Manager):  # type: ignore
                 "account_id__icontains": secret_filter,
                 "issuer__icontains": secret_filter,
             }
-            or_filters = [Q(**{key: val}) for key, val in filter_kwargs.items()]
-            # noinspection PyTypeChecker
-            data = (
-                self.only("issuer", "account_id", "secret")
-                .filter(user=user)
-                .filter(reduce(operator.or_, or_filters))
-                .order_by("issuer")
-            )
-            result = []
-            async for e in data:
-                result.append(e)
-            return result, len(result)
+            return await self.export_secrets(user, filter_kwargs)
         except self.model.DoesNotExist:
             return [], 0
 
@@ -186,14 +176,13 @@ class SecretManager(models.Manager):  # type: ignore
         Returns:
             tuple: Data and the no of records in it
         """
-        from telegram.utils import prepare_filter, prepare_user_filter
+        from telegram.utils import or_filters, prepare_user_filter
 
         # noinspection PyTypeChecker
         try:
             user_filter = prepare_user_filter(user)
-            user_filter.update(secret_filter)
-            combined_filter = prepare_filter(user_filter)
-            data = self.filter(*combined_filter)
+            combined_filter = or_filters(secret_filter)
+            data = self.filter(**user_filter).filter(combined_filter)
             result = []
             async for e in data:
                 result.append(e)
