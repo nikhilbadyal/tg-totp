@@ -325,3 +325,11 @@ def all_files(folder_name: Path) -> None:
             path.unlink()
         elif path.is_dir():
             rmtree(path)
+
+
+def command_help(command: str) -> str:
+    """Return func for command helper."""
+    from telegram.commands.add import add_usage
+
+    mapper = {"add": add_usage()}
+    return mapper[command]

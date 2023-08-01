@@ -3,7 +3,7 @@
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
 
-from telegram.strings import command_not_found
+from telegram.strings import command_not_found, docs_not_found
 
 # Import some helper functions
 from telegram.utils import SupportedCommands, command_help
@@ -57,4 +57,8 @@ async def handle_help_message(event: events.NewMessage.Event) -> None:
         if f"/{data}" not in SupportedCommands.get_values():
             await event.reply(command_not_found)
         else:
-            await event.reply(data)
+            try:
+                usage = command_help(data)
+                await event.reply(usage)
+            except KeyError:
+                await event.reply(docs_not_found)
