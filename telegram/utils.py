@@ -4,12 +4,20 @@ import operator
 import os
 from enum import Enum
 from functools import reduce
+from pathlib import Path
+from shutil import rmtree
 from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import quote_plus
+from zipfile import ZipFile
 
 import pyotp
+import qrcode
 from django.db.models import Q
 from django.utils.translation import gettext as _
 from loguru import logger
+from qrcode.image.styledpil import StyledPilImage
+from qrcode.image.styles.colormasks import VerticalGradiantColorMask
+from qrcode.image.styles.moduledrawers import HorizontalBarsDrawer
 from telethon import events, types
 from telethon.extensions import markdown
 from telethon.tl.types import User as TelegramUser
@@ -68,6 +76,7 @@ class SupportedCommands(Enum):
     RESET: str = "/reset"
     TOTAL: str = "/total"
     RM: str = "/rm"
+    EXPORTQR: str = "/exportqr"
 
     @classmethod
     def get_values(cls) -> List[str]:
@@ -272,3 +281,46 @@ def prepare_user_filter(user: User) -> Dict[str, Any]:
     """Prepare queryset fileter for user."""
     queryset_filters = {"user__in": [user]}
     return queryset_filters
+
+
+def create_qr(uris: Dict[str, Secret], zip_file_name: str) -> Path:
+    """Create qr image from uris list."""
+    folder_name = "qrexports/"
+    for uri, secret in uris.items():
+        qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L)
+        qr.add_data(uri)
+        qr_code = qr.make_image(
+            image_factory=StyledPilImage,
+            module_drawer=HorizontalBarsDrawer(),
+            color_mask=VerticalGradiantColorMask(),
+        )
+        file_name = f"{secret.id}_{quote_plus(secret.issuer)}_{quote_plus(secret.account_id)}.png"
+        qr_code.save(
+            f"{folder_name}/{file_name}",
+        )
+    if len(uris) < 1:
+        visible_files = [
+            file
+            for file in Path(folder_name).iterdir()
+            if not file.name.startswith(".")
+        ]
+        return visible_files[0]
+    zip_name = f"{zip_file_name}.zip"
+    # Create object of ZipFile
+    with ZipFile(zip_name, "w") as zip_object:
+        # Traverse all files in directory
+        for folder_name, sub_folders, file_names in os.walk(folder_name):
+            for filename in file_names:
+                file_path = os.path.join(folder_name, filename)
+                zip_object.write(file_path, os.path.basename(file_path))
+    all_files(Path(folder_name))
+    return Path(zip_name)
+
+
+def all_files(folder_name: Path) -> None:
+    """Delete all files from given folder."""
+    for path in Path(folder_name).glob("**/*"):
+        if path.is_file() and path.name != "README.md":
+            path.unlink()
+        elif path.is_dir():
+            rmtree(path)
