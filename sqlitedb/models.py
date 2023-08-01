@@ -174,21 +174,30 @@ class SecretManager(models.Manager):  # type: ignore
         except self.model.DoesNotExist:
             return [], 0
 
-    async def export_secrets(self, user: User) -> Tuple[Any, int]:
+    async def export_secrets(
+        self, user: User, secret_filter: Dict[str, Any]
+    ) -> Tuple[Any, int]:
         """Return all secrets for a given user.
 
         Args:
             user (User): User.
+            secret_filter (Dict[str, str]): Filter Criteria.
 
         Returns:
             tuple: Data and the no of records in it
         """
-        # Retrieve the records for the given user
+        from telegram.utils import prepare_filter, prepare_user_filter
+
         # noinspection PyTypeChecker
         try:
-            data = await self.filter(user=user).aget()
-            size = len(data)
-            return data, size
+            user_filter = prepare_user_filter(user)
+            user_filter.update(secret_filter)
+            combined_filter = prepare_filter(user_filter)
+            data = self.filter(*combined_filter)
+            result = []
+            async for e in data:
+                result.append(e)
+            return result, len(result)
         except self.model.DoesNotExist:
             return [], 0
 

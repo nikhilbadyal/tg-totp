@@ -18,7 +18,7 @@ def add_export_handlers(client: TelegramClient) -> None:
 
 
 # Register the function to handle the /export command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.EXPORT.value}$"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.EXPORT.value}\\s*(\\d*)$"))  # type: ignore
 async def handle_export_message(event: events.NewMessage.Event) -> None:
     """Handle /export command.
 
@@ -28,8 +28,14 @@ async def handle_export_message(event: events.NewMessage.Event) -> None:
     Returns:
         None: This function doesn't return anything.
     """
+    data = event.pattern_match.group(1).strip()
+    secret_filter = {}
+    if data:
+        secret_filter = {"id__in": [int(data)]}
     user = await get_user(event)
-    data, size = await Secret.objects.export_secrets(user=user)
+    data, size = await Secret.objects.export_secrets(
+        user=user, secret_filter=secret_filter
+    )
     if size == 0:
         await event.reply(message=no_export)
     else:

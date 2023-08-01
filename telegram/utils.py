@@ -5,6 +5,7 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
 import pyotp
+from django.db.models import Q
 from django.utils.translation import gettext as _
 from loguru import logger
 from telethon import events, types
@@ -254,3 +255,18 @@ async def get_user(event: events.NewMessage.Event) -> User:
     telegram_user: TelegramUser = await get_telegram_user(event)
     user = await User.objects.get_user(telegram_user=telegram_user)
     return user
+
+
+def prepare_filter(filters: Dict[str, Any]) -> List[Q]:
+    """Prepare queryset fileter from dict."""
+    updated_filter = []
+    for k, v in filters.items():
+        if v:
+            updated_filter.append(Q(**{k: v}))
+    return updated_filter
+
+
+def prepare_user_filter(user: User) -> Dict[str, Any]:
+    """Prepare queryset fileter for user."""
+    queryset_filters = {"user__in": [user]}
+    return queryset_filters
