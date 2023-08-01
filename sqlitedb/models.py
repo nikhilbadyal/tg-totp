@@ -227,7 +227,7 @@ class SecretManager(models.Manager):  # type: ignore
             valid_till=valid_till.strftime("%b %d, %Y %I:%M:%S %p"),
         )
 
-    def export_print(self, secret: "Secret") -> Any:
+    def export_print(self, secret: "Secret") -> str:
         """Print Secret with minial details.
 
         Returns:
