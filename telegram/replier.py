@@ -10,6 +10,7 @@ from telegram.commands.export import add_export_handlers
 from telegram.commands.exportqr import add_exportqr_handlers
 from telegram.commands.general import add_general_handlers
 from telegram.commands.get import add_get_handlers
+from telegram.commands.help import add_help_handlers
 from telegram.commands.list import add_list_handlers
 from telegram.commands.reset import add_reset_handlers
 from telegram.commands.rm import add_rm_handlers
@@ -70,6 +71,7 @@ class Telegram(object):
         add_rm_handlers(self.client)
         add_general_handlers(self.client)
         add_exportqr_handlers(self.client)
+        add_help_handlers(self.client)
 
         # Start listening for incoming bot messages
         self.client.run_until_disconnected()

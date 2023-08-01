@@ -77,6 +77,7 @@ class SupportedCommands(Enum):
     TOTAL: str = "/total"
     RM: str = "/rm"
     EXPORTQR: str = "/exportqr"
+    HELP: str = "/help"
 
     @classmethod
     def get_values(cls) -> List[str]:
