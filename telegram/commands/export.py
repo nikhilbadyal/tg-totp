@@ -2,8 +2,6 @@
 import os
 from datetime import datetime
 
-from asgiref.sync import sync_to_async
-
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
 
@@ -31,7 +29,7 @@ async def handle_export_message(event: events.NewMessage.Event) -> None:
         None: This function doesn't return anything.
     """
     user = await get_user(event)
-    data, size = await sync_to_async(Secret.objects.export_secrets)(user=user)
+    data, size = await Secret.objects.export_secrets(user=user)
     if size == 0:
         await event.reply(message=no_export)
     else:

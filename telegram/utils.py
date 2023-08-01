@@ -5,7 +5,6 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
 
 import pyotp
-from asgiref.sync import sync_to_async
 from django.utils.translation import gettext as _
 from loguru import logger
 from telethon import events, types
@@ -178,7 +177,7 @@ async def add_secret_data(secret_data: Dict[str, str], user: User) -> str:
     """Add secret data."""
     is_valid_2fa_secret(secret_data["secret"])
     # Get the user associated with the message
-    await sync_to_async(Secret.objects.create_secret)(user=user, **secret_data)
+    await Secret.objects.create_secret(user=user, **secret_data)
     return added_secret
 
 
@@ -253,5 +252,5 @@ def import_failure_output_file(import_failures: Dict[str, List[Dict[str, str]]])
 async def get_user(event: events.NewMessage.Event) -> User:
     """Get out user from telegram user."""
     telegram_user: TelegramUser = await get_telegram_user(event)
-    user = await sync_to_async(User.objects.get_user)(telegram_user)
+    user = await User.objects.get_user(telegram_user=telegram_user)
     return user

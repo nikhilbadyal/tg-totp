@@ -1,5 +1,4 @@
 """Handle rm command."""
-from asgiref.sync import sync_to_async
 
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
@@ -33,9 +32,7 @@ async def handle_rm_message(event: events.NewMessage.Event) -> None:
             raise ValueError()
         secret_id = int(data)
         user = await get_user(event)
-        size = await sync_to_async(Secret.objects.rm_user_secret)(
-            user=user, secret_id=secret_id
-        )
+        size = await Secret.objects.rm_user_secret(user=user, secret_id=secret_id)
         await event.reply(f"Delete {size} secret.")
     except ValueError:
         await event.reply(no_input)

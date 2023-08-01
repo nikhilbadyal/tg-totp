@@ -1,7 +1,6 @@
 """User Settings modifications."""
 from typing import Dict
 
-from asgiref.sync import sync_to_async
 from telethon import events
 
 from sqlitedb.models import User
@@ -30,8 +29,7 @@ async def modify_page_size(
 
         user_settings[UserSettings.PAGE_SIZE.value] = str(page_size)
         user.settings = user_settings
-        await sync_to_async(user.save)()
-
+        await user.asave()
         await event.reply(page_size_updated)
     except ValueError:
         await event.reply(invalid_page_size)

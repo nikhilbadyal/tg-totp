@@ -1,5 +1,4 @@
 """Handle total command."""
-from asgiref.sync import sync_to_async
 
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
@@ -27,5 +26,5 @@ async def handle_total_message(event: events.NewMessage.Event) -> None:
         None: This function doesn't return anything.
     """
     user = await get_user(event)
-    size = await sync_to_async(Secret.objects.total_secrets)(user=user)
+    size = await Secret.objects.total_secrets(user=user)
     await event.reply(f"There are {size} secrets in total.")

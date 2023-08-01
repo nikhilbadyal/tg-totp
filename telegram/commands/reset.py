@@ -1,5 +1,4 @@
 """Handle Reset Command."""
-from asgiref.sync import sync_to_async
 from loguru import logger
 
 # Import necessary libraries and modules
@@ -45,7 +44,7 @@ async def handle_reset_confirm_response(
     logger.debug("Received reset callback")
     if event.data == reset_yes_data:
         user = await get_user(event)
-        size = await sync_to_async(Secret.objects.clear_user_secrets)(user=user)
+        size = await Secret.objects.clear_user_secrets(user=user)
         await event.edit(f"Deleted {size} secrets.")
     elif event.data == reset_no_data:
         await event.edit(ignore)

@@ -21,7 +21,7 @@ Field.register_lookup(Like)
 class UserManager(models.Manager):  # type: ignore
     """Manager for the User model."""
 
-    def get_user(self, telegram_user: TelegramUser) -> "User":
+    async def get_user(self, telegram_user: TelegramUser) -> "User":
         """Retrieve a User object from the database for a given user_id. If the
         user does not exist, create a new user.
 
@@ -32,9 +32,9 @@ class UserManager(models.Manager):  # type: ignore
             User: The User object corresponding to the specified user ID
         """
         try:
-            user: User = self.filter(telegram_id=telegram_user.id).get()
+            user: User = await self.filter(telegram_id=telegram_user.id).aget()
         except self.model.DoesNotExist:
-            user = User.objects.create(
+            user = await User.objects.acreate(
                 telegram_id=telegram_user.id,
                 **{"name": f"{telegram_user.first_name} {telegram_user.last_name}"},
             )
@@ -103,10 +103,10 @@ class User(models.Model):
 class SecretManager(models.Manager):  # type: ignore
     """Manager for the User model."""
 
-    def create_secret(self, user: User, **kwargs: Any) -> "Secret":
+    async def create_secret(self, user: User, **kwargs: Any) -> "Secret":
         """Add secret."""
         try:
-            return self.create(user=user, **kwargs)  # type: ignore
+            return await self.acreate(user=user, **kwargs)  # type: ignore
         except IntegrityError:
             raise DuplicateSecret()
 
@@ -143,7 +143,7 @@ class SecretManager(models.Manager):  # type: ignore
         # Use the helper function to paginate the queryset
         return paginate_queryset(data, page, per_page)
 
-    def get_secret(self, user: User, secret_filter: str) -> Tuple[Any, int]:
+    async def get_secret(self, user: User, secret_filter: str) -> Tuple[Any, int]:
         """Return a paginated list of secrets for a given user.
 
         Args:
@@ -154,22 +154,27 @@ class SecretManager(models.Manager):  # type: ignore
             tuple: Data and the no of records in it
         """
         # Retrieve the records for the given user
-        filter_kwargs = {
-            "account_id__icontains": secret_filter,
-            "issuer__icontains": secret_filter,
-        }
-        or_filters = [Q(**{key: val}) for key, val in filter_kwargs.items()]
-        # noinspection PyTypeChecker
-        data = (
-            self.only("issuer", "account_id", "secret")
-            .filter(user=user)
-            .filter(reduce(operator.or_, or_filters))
-            .order_by("issuer")
-        )
-        size = len(data)
-        return data, size
+        try:
+            filter_kwargs = {
+                "account_id__icontains": secret_filter,
+                "issuer__icontains": secret_filter,
+            }
+            or_filters = [Q(**{key: val}) for key, val in filter_kwargs.items()]
+            # noinspection PyTypeChecker
+            data = (
+                self.only("issuer", "account_id", "secret")
+                .filter(user=user)
+                .filter(reduce(operator.or_, or_filters))
+                .order_by("issuer")
+            )
+            result = []
+            async for e in data:
+                result.append(e)
+            return result, len(result)
+        except self.model.DoesNotExist:
+            return [], 0
 
-    def export_secrets(self, user: User) -> Tuple[Any, int]:
+    async def export_secrets(self, user: User) -> Tuple[Any, int]:
         """Return all secrets for a given user.
 
         Args:
@@ -180,11 +185,14 @@ class SecretManager(models.Manager):  # type: ignore
         """
         # Retrieve the records for the given user
         # noinspection PyTypeChecker
-        data = self.filter(user=user)
-        size = len(data)
-        return data, size
+        try:
+            data = await self.filter(user=user).aget()
+            size = len(data)
+            return data, size
+        except self.model.DoesNotExist:
+            return [], 0
 
-    def total_secrets(self, user: User) -> int:
+    async def total_secrets(self, user: User) -> int:
         """Return count of all secrets for a given user.
 
         Args:
@@ -195,7 +203,7 @@ class SecretManager(models.Manager):  # type: ignore
         """
         # Retrieve the records for the given user
         # noinspection PyTypeChecker
-        return self.filter(user=user).count()
+        return await self.filter(user=user).acount()
 
     def reduced_print(self, secret: "Secret") -> Any:
         """Print Secret with minial details.
@@ -237,14 +245,14 @@ class SecretManager(models.Manager):  # type: ignore
             secret=secret.secret.strip(),
         )
 
-    def clear_user_secrets(self, user: User) -> int:
+    async def clear_user_secrets(self, user: User) -> int:
         """Clear all secret for a given user."""
-        deleted, _ = self.filter(user=user).delete()
+        deleted, _ = await self.filter(user=user).adelete()
         return deleted
 
-    def rm_user_secret(self, user: User, secret_id: int) -> int:
+    async def rm_user_secret(self, user: User, secret_id: int) -> int:
         """Clear secret with given id."""
-        deleted, _ = self.filter(user=user, id=secret_id).delete()
+        deleted, _ = await self.filter(user=user, id=secret_id).adelete()
         return deleted
 
 

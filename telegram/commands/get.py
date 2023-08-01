@@ -1,5 +1,4 @@
 """Handle get command."""
-from asgiref.sync import sync_to_async
 
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
@@ -33,9 +32,7 @@ async def handle_get_message(event: events.NewMessage.Event) -> None:
             raise ValueError()
         user = await get_user(event)
 
-        data, size = await sync_to_async(Secret.objects.get_secret)(
-            user=user, secret_filter=data
-        )
+        data, size = await Secret.objects.get_secret(user=user, secret_filter=data)
         if size > 0:
             response = f"Here are the TOTP for **{size}** found secrets.\n\n"
             for secret in data:
