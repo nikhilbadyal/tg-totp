@@ -17,6 +17,17 @@ def add_exportqr_handlers(client: TelegramClient) -> None:
     client.add_event_handler(handle_exportqr_message)
 
 
+def exportqr_usage() -> str:
+    """Return the usage of add command."""
+    usage = (
+        "You can do 2 types of QR exports.\n"
+        "1. If /exportqr command is sent without any input it will export all the QR code images in a zip file.\n"
+        "2. If /exportqr command is sent with ID the QR code will be sent directly"
+        "for that ID. You can get ID from /list or /get command."
+    )
+    return usage
+
+
 # Register the function to handle the /exportqr command
 @events.register(events.NewMessage(pattern=f"^{SupportedCommands.EXPORTQR.value}\\s*(\\d*)$"))  # type: ignore
 async def handle_exportqr_message(event: events.NewMessage.Event) -> None:
