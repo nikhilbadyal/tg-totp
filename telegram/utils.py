@@ -332,10 +332,12 @@ def command_help(command: str) -> str:
     from telegram.commands.add import add_usage
     from telegram.commands.adduri import adduri_usage
     from telegram.commands.addurifile import addurifile_usage
+    from telegram.commands.export import export_usage
 
     mapper = {
         "add": add_usage(),
         "adduri": adduri_usage(),
         "addurifile": addurifile_usage(),
+        "export": export_usage(),
     }
     return mapper[command]

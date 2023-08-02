@@ -17,6 +17,18 @@ def add_export_handlers(client: TelegramClient) -> None:
     client.add_event_handler(handle_export_message)
 
 
+def export_usage() -> str:
+    """Return the usage of add command."""
+    usage = (
+        "You can do 2 types of exports.\n"
+        "1. If /export command is sent without any input it will export all the uris.\n"
+        "2. If /export command is sent with ID the URI will be exported "
+        "for that URI. You can get ID from /list or /get "
+        "command."
+    )
+    return usage
+
+
 # Register the function to handle the /export command
 @events.register(events.NewMessage(pattern=f"^{SupportedCommands.EXPORT.value}\\s*(\\d*)$"))  # type: ignore
 async def handle_export_message(event: events.NewMessage.Event) -> None:
