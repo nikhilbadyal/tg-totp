@@ -40,7 +40,7 @@ async def handle_export_message(event: events.NewMessage.Event) -> None:
     Returns:
         None: This function doesn't return anything.
     """
-    await event.reply(processing_request)
+    message = await event.reply(processing_request)
     data = event.pattern_match.group(1).strip()
     secret_filter = {}
     if data:
@@ -58,6 +58,7 @@ async def handle_export_message(event: events.NewMessage.Event) -> None:
         output_file = f"export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         with open(output_file, "w", encoding="utf-8") as file:
             file.write("\n".join(uris))
+        await message.delete()
         await event.reply(message=f"Exported {size} URIs.", file=output_file)
         try:
             os.remove(output_file)
