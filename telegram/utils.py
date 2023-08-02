@@ -337,6 +337,7 @@ def command_help(command: str) -> str:
     from telegram.commands.help import help_usage
     from telegram.commands.list import list_usage
     from telegram.commands.reset import reset_usage
+    from telegram.commands.rm import rm_usage
 
     mapper = {
         "add": add_usage(),
@@ -347,5 +348,6 @@ def command_help(command: str) -> str:
         "help": help_usage(),
         "list": list_usage(),
         "reset": reset_usage(),
+        "rm": rm_usage(),
     }
     return mapper[command]
