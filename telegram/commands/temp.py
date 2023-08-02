@@ -15,6 +15,15 @@ def add_temp_handlers(client: TelegramClient) -> None:
     client.add_event_handler(handle_temp_message)
 
 
+def temp_usage() -> str:
+    """Return the usage of add command."""
+    usage = (
+        "This command help you in getting OTP for a secret **without** saving it.\n"
+        "The command expects secret as input to the command."
+    )
+    return usage
+
+
 # Register the function to handle the /temp command
 @events.register(events.NewMessage(pattern=rf"^{SupportedCommands.TEMP.value}(.*)"))  # type: ignore
 async def handle_temp_message(event: events.NewMessage.Event) -> None:
