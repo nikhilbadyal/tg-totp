@@ -341,6 +341,7 @@ def command_help(command: str) -> str:
     from telegram.commands.settings import settings_usage
     from telegram.commands.start import start_usage
     from telegram.commands.temp import temp_usage
+    from telegram.commands.total import total_usage
 
     mapper = {
         "add": add_usage(),
@@ -355,5 +356,6 @@ def command_help(command: str) -> str:
         "settings": settings_usage(),
         "start": start_usage(),
         "temp": temp_usage(),
+        "total": total_usage(),
     }
     return mapper[command]
