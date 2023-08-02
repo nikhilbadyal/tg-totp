@@ -6,7 +6,7 @@ from urllib.parse import quote_plus
 from telethon import TelegramClient, events
 
 from sqlitedb.models import Secret
-from telegram.strings import no_export
+from telegram.strings import no_export, processing_request
 
 # Import some helper functions
 from telegram.utils import SupportedCommands, all_files, create_qr, get_user
@@ -39,6 +39,7 @@ async def handle_exportqr_message(event: events.NewMessage.Event) -> None:
     Returns:
         None: This function doesn't return anything.
     """
+    message = await event.reply(processing_request)
     data = event.pattern_match.group(1).strip()
     secret_filter = {}
     if data:
@@ -56,6 +57,7 @@ async def handle_exportqr_message(event: events.NewMessage.Event) -> None:
             qr_meta.update({uri: secret})
         zip_file_name = f"{user.id}_{quote_plus(user.name)}"
         os_path = create_qr(qr_meta, zip_file_name)
+        await message.delete()
         await event.reply(
             message=f"Exported {len(qr_meta)} qr images.",
             file=str(os_path),
