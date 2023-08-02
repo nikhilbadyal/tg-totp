@@ -16,6 +16,16 @@ def add_adduri_handlers(client: TelegramClient) -> None:
     client.add_event_handler(handle_adduri_message)
 
 
+def adduri_usage() -> str:
+    """Return the usage of add command."""
+    usage = (
+        "/adduri command expect `Key-URI` as input to the command.\n"
+        "You can check the format "
+        "[here](https://docs.yubico.com/yesdk/users-manual/application-oath/uri-string-format.html)"
+    )
+    return usage
+
+
 # Register the function to handle the /adduri command
 @events.register(events.NewMessage(pattern=rf"^{SupportedCommands.ADDURI.value}(?!file)(.*)"))  # type: ignore
 async def handle_adduri_message(event: events.NewMessage.Event) -> None:

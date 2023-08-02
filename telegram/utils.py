@@ -330,6 +330,7 @@ def all_files(folder_name: Path) -> None:
 def command_help(command: str) -> str:
     """Return func for command helper."""
     from telegram.commands.add import add_usage
+    from telegram.commands.adduri import adduri_usage
 
-    mapper = {"add": add_usage()}
+    mapper = {"add": add_usage(), "adduri": adduri_usage()}
     return mapper[command]
