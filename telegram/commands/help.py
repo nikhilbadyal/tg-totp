@@ -39,6 +39,12 @@ def add_help_handlers(client: TelegramClient) -> None:
     client.add_event_handler(handle_help_message)
 
 
+def help_usage() -> str:
+    """Return the usage of add command."""
+    usage = "Really bro🥸."
+    return usage
+
+
 # Register the function to handle the /help command
 @events.register(events.NewMessage(pattern=f"^{SupportedCommands.HELP.value}(.*)"))  # type: ignore
 async def handle_help_message(event: events.NewMessage.Event) -> None:
