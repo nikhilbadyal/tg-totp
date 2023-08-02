@@ -15,6 +15,17 @@ def add_settings_handlers(client: TelegramClient) -> None:
     client.add_event_handler(handle_settings_current_settings)
 
 
+def settings_usage() -> str:
+    """Return the usage of add command."""
+    usage = (
+        "This command help you in listing or modifying settings.\n"
+        "To update a setting, use the following command in format:\n"
+        "`/settings <setting_name> <value>`\n\n"
+        "** For example **:\n`/settings page_size 5`\n\n"
+    )
+    return usage
+
+
 @events.register(events.CallbackQuery(pattern="list_settings"))  # type: ignore
 async def handle_settings_list_settings(
     event: events.callbackquery.CallbackQuery.Event,
