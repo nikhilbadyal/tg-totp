@@ -15,6 +15,16 @@ def add_list_handlers(client: TelegramClient) -> None:
     client.add_event_handler(navigate_pages)
 
 
+def list_usage() -> str:
+    """Return the usage of add command."""
+    usage = (
+        "This command list all the secret available."
+        "The results are paginated with default size of **5**."
+        "\nPage size is configurable. See `/help settings`"
+    )
+    return usage
+
+
 @events.register(events.CallbackQuery(pattern=r"(next|prev)_page:(\d+)"))  # type: ignore
 async def navigate_pages(event: events.callbackquery.CallbackQuery.Event):
     """Event handler to navigate between pages of records.

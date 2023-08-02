@@ -335,6 +335,7 @@ def command_help(command: str) -> str:
     from telegram.commands.export import export_usage
     from telegram.commands.exportqr import exportqr_usage
     from telegram.commands.help import help_usage
+    from telegram.commands.list import list_usage
 
     mapper = {
         "add": add_usage(),
@@ -343,5 +344,6 @@ def command_help(command: str) -> str:
         "export": export_usage(),
         "exportqr": exportqr_usage(),
         "help": help_usage(),
+        "list": list_usage(),
     }
     return mapper[command]
