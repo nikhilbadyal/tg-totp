@@ -6,7 +6,7 @@ from datetime import datetime
 from telethon import TelegramClient, events
 
 from sqlitedb.models import Secret
-from telegram.strings import no_export
+from telegram.strings import no_export, processing_request
 
 # Import some helper functions
 from telegram.utils import SupportedCommands, get_user
@@ -40,6 +40,7 @@ async def handle_export_message(event: events.NewMessage.Event) -> None:
     Returns:
         None: This function doesn't return anything.
     """
+    await event.reply(processing_request)
     data = event.pattern_match.group(1).strip()
     secret_filter = {}
     if data:

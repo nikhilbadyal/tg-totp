@@ -5,7 +5,7 @@ import os
 from telethon import TelegramClient, events
 
 from telegram.exceptions import FileProcessFail
-from telegram.strings import file_process_failed, no_input, processing_file
+from telegram.strings import file_process_failed, no_input, processing_request
 
 # Import some helper functions
 from telegram.utils import (
@@ -47,7 +47,7 @@ async def handle_addurifile_message(event: events.NewMessage.Event) -> None:
     message = None
     try:
         uri_file = await get_uri_file_from_message(event)
-        message = await event.reply(processing_file)
+        message = await event.reply(processing_request)
         uris = process_uri_file(uri_file)
         parsed_secret, parse_failed = extract_secret_from_uri(uris)
         user = await get_user(event)
