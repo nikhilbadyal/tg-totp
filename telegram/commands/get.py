@@ -14,7 +14,14 @@ def add_get_handlers(client: TelegramClient) -> None:
     """get /get command Event Handler."""
     client.add_event_handler(handle_get_message)
 
-
+def get_usage() -> str:
+    """Return the usage of add command."""
+    usage = (
+        "/get command expect filter as input to the command.\n"
+        "If any URI(s) contain issuer or account name which matches with filter. "
+        "It will be returned along with ID and OTP."
+    )
+    return usage
 # Register the function to handle the /get command
 @events.register(events.NewMessage(pattern=f"^{SupportedCommands.GET.value}(.*)"))  # type: ignore
 async def handle_get_message(event: events.NewMessage.Event) -> None:
