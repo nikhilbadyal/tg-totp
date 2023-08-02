@@ -22,6 +22,15 @@ def add_reset_handlers(client: TelegramClient) -> None:
     client.add_event_handler(handle_reset_confirm_response)
 
 
+def reset_usage() -> str:
+    """Return the usage of add command."""
+    usage = (
+        "This command will help you in cleaning up all the secrets."
+        "It doesn't expect any arguments."
+    )
+    return usage
+
+
 @events.register(events.callbackquery.CallbackQuery(pattern="^reset_(yes|no)$"))  # type: ignore
 async def handle_reset_confirm_response(
     event: events.callbackquery.CallbackQuery.Event,
