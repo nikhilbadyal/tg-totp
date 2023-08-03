@@ -1,1 +1,3 @@
-# Template for telegram Chatbot with Django ORM
+# In Progress
+
+You can check the progress [here](https://t.me/tgtotpbot)
