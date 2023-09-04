@@ -13,7 +13,7 @@ from telegram.utils import SupportedCommands, get_user
 
 
 def add_export_handlers(client: TelegramClient) -> None:
-    """export /export command Event Handler."""
+    """Export /export command Event Handler."""
     client.add_event_handler(handle_export_message)
 
 

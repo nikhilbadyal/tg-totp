@@ -11,7 +11,7 @@ from telegram.utils import SupportedCommands, get_user
 
 
 def add_get_handlers(client: TelegramClient) -> None:
-    """get /get command Event Handler."""
+    """Get /get command Event Handler."""
     client.add_event_handler(handle_get_message)
 
 
