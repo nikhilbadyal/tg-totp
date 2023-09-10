@@ -75,16 +75,14 @@ async def handle_settings_command(event: events.NewMessage.Event) -> None:
     Args:
         event (NewMessage.Event): The new message event.
     """
-    # Extract the setting name and new value from the input message
-    setting_part = 3
     parts = event.message.text.split()
+    setting_part = 3
     if len(parts) < setting_part:
         response = (
             "To update a setting, use the following command format:\n``/settings <setting_name> <value>`\n\n"
             "**For example**:\n`/settings page_size 5`\n\n"
+            + "Click the **List Settings** button below to see available settings."
         )
-        response += "Click the **List Settings** button below to see available settings."
-
         buttons = [
             Button.inline("List Settings", data="list_settings"),
             Button.inline("Current Settings", data="current_settings"),
