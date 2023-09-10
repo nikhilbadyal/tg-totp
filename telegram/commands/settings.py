@@ -104,9 +104,7 @@ async def handle_settings_command(event: events.NewMessage.Event) -> None:
         UserSettings.PAGE_SIZE.value: modify_page_size,
     }
 
-    if setting_modification_function := settings_modification_functions.get(
-        setting_name.lower()
-    ):
+    if setting_modification_function := settings_modification_functions.get(setting_name.lower()):
         await setting_modification_function(event, user, user_settings, new_value)
     else:
         await event.reply(

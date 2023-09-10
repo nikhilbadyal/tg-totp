@@ -31,10 +31,9 @@ class MyHandler(FileSystemEventHandler):  # type: ignore[misc]
         path_components = os.path.normpath(event.src_path).split(os.path.sep)
 
         # Check if the modified file is not in the excluded directories and has a .py extension
-        if all(
-            directory not in path_components
-            for directory in self.excluded_directories
-        ) and event.src_path.endswith(".py"):
+        if all(directory not in path_components for directory in self.excluded_directories) and event.src_path.endswith(
+            ".py"
+        ):
             print(f"File modified {event.src_path}, restarting...")
             self.restart_process()
 
