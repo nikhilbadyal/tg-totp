@@ -81,7 +81,7 @@ async def handle_settings_command(event: events.NewMessage.Event) -> None:
         response = (
             "To update a setting, use the following command format:\n``/settings <setting_name> <value>`\n\n"
             "**For example**:\n`/settings page_size 5`\n\n"
-            + "Click the **List Settings** button below to see available settings."
+            "Click the **List Settings** button below to see available settings."
         )
         buttons = [
             Button.inline("List Settings", data="list_settings"),
