@@ -16,22 +16,22 @@ def add_total_handlers(client: TelegramClient) -> None:
 
 def total_usage() -> str:
     """Return the usage of add command."""
-    usage = (
+    return (
         "This command help you in getting count of total no of secret.\n"
         "The command doesn't expects any argument as input."
     )
-    return usage
 
 
 # Register the function to handle the /total command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.TOTAL.value}$"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.TOTAL.value}$"))  # type: ignore[misc]
 async def handle_total_message(event: events.NewMessage.Event) -> None:
     """Handle /total command.
 
     Args:
         event (events.NewMessage.Event): A new message event.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     user = await get_user(event)

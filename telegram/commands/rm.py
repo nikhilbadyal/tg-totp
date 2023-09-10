@@ -17,30 +17,30 @@ def add_rm_handlers(client: TelegramClient) -> None:
 
 def rm_usage() -> str:
     """Return the usage of add command."""
-    usage = (
+    return (
         "This command help you in removing specific secret.\n"
         "The command expects ID of the URI to be removed "
         "for that URI. You can get ID from /list or /get "
         "command."
     )
-    return usage
 
 
 # Register the function to handle the /rm command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.RM.value}(.*)"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.RM.value}(.*)"))  # type: ignore[misc]
 async def handle_rm_message(event: events.NewMessage.Event) -> None:
     """Handle /rm command.
 
     Args:
         event (events.NewMessage.Event): A new message event.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     try:
         data = event.pattern_match.group(1).strip()
         if not data:
-            raise ValueError()
+            raise ValueError
         secret_id = int(data)
         user = await get_user(event)
         size = await Secret.objects.rm_user_secret(user=user, secret_id=secret_id)

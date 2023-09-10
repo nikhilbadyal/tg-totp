@@ -1,5 +1,5 @@
 """Models."""
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Self, Tuple
 from urllib.parse import quote
 
 from django.db import IntegrityError, models
@@ -7,35 +7,36 @@ from django.db.models import Field
 from telethon.tl.types import User as TelegramUser
 
 from manage import init_django
-from sqlitedb.lookups import Like
+from sqlitedb.lookups import ILike
 from sqlitedb.utils import UserStatus, paginate_queryset
-from telegram.exceptions import DuplicateSecret
+from telegram.exceptions import DuplicateSecretError
 
 init_django()
 
-Field.register_lookup(Like)
+Field.register_lookup(ILike)
 
 
-class UserManager(models.Manager):  # type: ignore
+class UserManager(models.Manager):  # type: ignore[type-arg]
     """Manager for the User model."""
 
-    async def get_user(self, telegram_user: TelegramUser) -> "User":
-        """Retrieve a User object from the database for a given user_id. If the
-        user does not exist, create a new user.
+    async def get_user(self: Self, telegram_user: TelegramUser) -> "User":
+        """Retrieve a User object from the database for a given user_id. If the user does not exist, create a new user.
 
         Args:
             telegram_user (TelegramUser): The ID of the user to retrieve or create.
 
-        Returns:
+        Returns
+        -------
             User: The User object corresponding to the specified user ID
         """
         try:
             user: User = await self.filter(telegram_id=telegram_user.id).aget()
         except self.model.DoesNotExist:
-            user = await User.objects.acreate(
-                telegram_id=telegram_user.id,
-                **{"name": f"{telegram_user.first_name} {telegram_user.last_name}"},
-            )
+            user_dict = {
+                "telegram_id": telegram_user.id,
+                "name": f"{telegram_user.first_name} {telegram_user.last_name}",
+            }
+            user = await User.objects.acreate(**user_dict)
 
         return user
 
@@ -43,7 +44,8 @@ class UserManager(models.Manager):  # type: ignore
 class User(models.Model):
     """Model for storing user data.
 
-    Attributes:
+    Attributes
+    ----------
         id (int): The unique ID of the user.
         name (str or None): The name of the user, or None if no name was provided.
         telegram_id (int): The ID of the user.
@@ -51,13 +53,8 @@ class User(models.Model):
         joining_date (datetime): The date and time when the user was added to the database.
         last_updated (datetime): The date and time when the user's details were last updated.
 
-    Managers:
-        objects (UserManager): The custom manager for this model.
-
-    Meta:
-        db_table (str): The name of the database table used to store this model's data.
-
-    Raises:
+    Raises
+    ------
         IntegrityError: If the user's Telegram ID is not unique.
     """
 
@@ -90,27 +87,31 @@ class User(models.Model):
     objects = UserManager()
 
     class Meta:
-        # Database table name
+        """Database table name."""
+
         db_table = "user"
 
-    def __str__(self) -> str:
+    def __str__(self: Self) -> str:
         """Return a string representation of the user object."""
         return f"User(id={self.id}, name={self.name}, telegram_id={self.telegram_id}, status={self.status})"
 
 
-class SecretManager(models.Manager):  # type: ignore
+class SecretManager(models.Manager):  # type: ignore[type-arg]
     """Manager for the User model."""
 
-    async def create_secret(self, user: User, **kwargs: Any) -> "Secret":
+    async def create_secret(self: Self, user: User, **kwargs: Any) -> "Secret":
         """Add secret."""
         try:
-            return await self.acreate(user=user, **kwargs)  # type: ignore
-        except IntegrityError:
-            raise DuplicateSecret()
+            obj = await self.acreate(user=user, **kwargs)
+            if isinstance(obj, Secret):
+                return obj
+            raise IntegrityError
+        except IntegrityError as e:
+            raise DuplicateSecretError from e
 
-    def possible_inputs(self) -> Dict[str, str]:
+    def possible_inputs(self: Self) -> Dict[str, str]:
         """Possible input."""
-        inputs = {
+        return {
             "secret": "secret",
             "issuer": "issuer",
             "digits": "digits",
@@ -118,9 +119,8 @@ class SecretManager(models.Manager):  # type: ignore
             "period": "period",
             "algorithm": "algorithm",
         }
-        return inputs
 
-    def get_secrets(self, user: User, page: int, per_page: int) -> Any:
+    def get_secrets(self: Self, user: User, page: int, per_page: int) -> Any:
         """Return a paginated list of secrets for a given user.
 
         Args:
@@ -128,7 +128,8 @@ class SecretManager(models.Manager):  # type: ignore
             page (int): The current page number.
             per_page (int): The number of records to display per page.
 
-        Returns:
+        Returns
+        -------
             dict: A dictionary containing the paginated records and pagination details.
         """
         from telegram.utils import or_filters, prepare_user_filter
@@ -144,14 +145,15 @@ class SecretManager(models.Manager):  # type: ignore
         # Use the helper function to paginate the queryset
         return paginate_queryset(data, page, per_page)
 
-    async def get_secret(self, user: User, secret_filter: str) -> Tuple[Any, int]:
+    async def get_secret(self: Self, user: User, secret_filter: str) -> Tuple[Any, int]:
         """Return a paginated list of secrets for a given user.
 
         Args:
             user (User): User.
             secret_filter (str): The current page number.
 
-        Returns:
+        Returns
+        -------
             tuple: Data and the no of records in it
         """
         # Retrieve the records for the given user
@@ -164,16 +166,15 @@ class SecretManager(models.Manager):  # type: ignore
         except self.model.DoesNotExist:
             return [], 0
 
-    async def export_secrets(
-        self, user: User, secret_filter: Dict[str, Any]
-    ) -> Tuple[Any, int]:
+    async def export_secrets(self: Self, user: User, secret_filter: Dict[str, Any]) -> Tuple[Any, int]:
         """Return all secrets for a given user.
 
         Args:
             user (User): User.
             secret_filter (Dict[str, str]): Filter Criteria.
 
-        Returns:
+        Returns
+        -------
             tuple: Data and the no of records in it
         """
         from telegram.utils import or_filters, prepare_user_filter
@@ -185,30 +186,30 @@ class SecretManager(models.Manager):  # type: ignore
             data = self.filter(**user_filter)
             if combined_filter:
                 data = data.filter(combined_filter)
-            result = []
-            async for e in data:
-                result.append(e)
+            result = list(data)
             return result, len(result)
         except self.model.DoesNotExist:
             return [], 0
 
-    async def total_secrets(self, user: User) -> int:
+    async def total_secrets(self: Self, user: User) -> int:
         """Return count of all secrets for a given user.
 
         Args:
             user (User): User.
 
-        Returns:
+        Returns
+        -------
             int:no of records
         """
         # Retrieve the records for the given user
         # noinspection PyTypeChecker
         return await self.filter(user=user).acount()
 
-    def reduced_print(self, secret: "Secret") -> Any:
+    def reduced_print(self: Self, secret: "Secret") -> Any:
         """Print Secret with minial details.
 
-        Returns:
+        Returns
+        -------
             str: String repr of secret.
         """
         from totp.totp import OTP
@@ -227,10 +228,11 @@ class SecretManager(models.Manager):  # type: ignore
             valid_till=valid_till.strftime("%b %d, %Y %I:%M:%S %p"),
         )
 
-    def export_print(self, secret: "Secret") -> str:
+    def export_print(self: Self, secret: "Secret") -> str:
         """Print Secret with minial details.
 
-        Returns:
+        Returns
+        -------
             str: String repr of secret.
         """
         return (
@@ -245,12 +247,12 @@ class SecretManager(models.Manager):  # type: ignore
             secret=secret.secret.strip(),
         )
 
-    async def clear_user_secrets(self, user: User) -> int:
+    async def clear_user_secrets(self: Self, user: User) -> int:
         """Clear all secret for a given user."""
         deleted, _ = await self.filter(user=user).adelete()
         return deleted
 
-    async def rm_user_secret(self, user: User, secret_id: int) -> int:
+    async def rm_user_secret(self: Self, user: User, secret_id: int) -> int:
         """Clear secret with given id."""
         deleted, _ = await self.filter(user=user, id=secret_id).adelete()
         return deleted
@@ -296,10 +298,11 @@ class Secret(models.Model):
     objects = SecretManager()
 
     class Meta:
-        # Database table name
+        """Database table name."""
+
         db_table = "secret"
 
-    def __str__(self) -> str:
+    def __str__(self: Self) -> str:
         """Return a string representation of the user object."""
         return (
             f"Secret [{self.secret}](spoiler) "

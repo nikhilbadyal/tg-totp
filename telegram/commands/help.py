@@ -41,30 +41,29 @@ def add_help_handlers(client: TelegramClient) -> None:
 
 def help_usage() -> str:
     """Return the usage of add command."""
-    usage = "Really bro🥸."
-    return usage
+    return "Really bro🥸."
 
 
 # Register the function to handle the /help command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.HELP.value}(.*)"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.HELP.value}(.*)"))  # type: ignore[misc]
 async def handle_help_message(event: events.NewMessage.Event) -> None:
     """Handle /help command.
 
     Args:
         event (events.NewMessage.Event): A new message event.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     data = event.pattern_match.group(1).strip()
     if not data:
         await event.reply(help_message)
+    elif f"/{data}" not in SupportedCommands.get_values():
+        await event.reply(command_not_found)
     else:
-        if f"/{data}" not in SupportedCommands.get_values():
-            await event.reply(command_not_found)
-        else:
-            try:
-                usage = command_help(data)
-                await event.reply(usage)
-            except KeyError:
-                await event.reply(docs_not_found)
+        try:
+            usage = command_help(data)
+            await event.reply(usage)
+        except KeyError:
+            await event.reply(docs_not_found)

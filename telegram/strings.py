@@ -1,8 +1,8 @@
 """Strings."""
 no_input = "Please provide valid input."
-invalid_secret = "Please check if secret is valid."
-added_secret = "Added secret."
-duplicate_secret = "Secret already exists."
+invalid_secret = "Please check if secret is valid."  # noqa: S105
+added_secret = "Added secret."  # noqa: S105
+duplicate_secret = "Secret already exists."  # noqa: S105
 user_fetch_failed = "Unable to get user details."
 invalid_setting = "Invalid setting name"
 file_process_failed = "Terminating URI file processing."

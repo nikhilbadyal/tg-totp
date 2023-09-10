@@ -14,19 +14,19 @@ def add_start_handlers(client: TelegramClient) -> None:
 
 def start_usage() -> str:
     """Return the usage of add command."""
-    usage = "It can be used to check if bot is alive or dead.\n"
-    return usage
+    return "It can be used to check if bot is alive or dead.\n"
 
 
 # Register the function to handle the /start command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.START.value}$"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.START.value}$"))  # type: ignore[misc]
 async def handle_start_message(event: events.NewMessage.Event) -> None:
     """Handle /start command.
 
     Args:
         event (events.NewMessage.Event): A new message event.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     # Get the user associated with the message

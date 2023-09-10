@@ -1,8 +1,5 @@
-#!/usr/bin/env python
-import os
+#!/usr/bin/env python # noqa: D100
 from pathlib import Path
-
-import environ
 
 
 def init_django() -> None:
@@ -13,11 +10,13 @@ def init_django() -> None:
     configured, this function does nothing.
     """
     import django
+    import environ
     from django.conf import settings
 
     env = environ.Env()
     base_dir = Path(__file__).resolve().parent
-    environ.Env.read_env(os.path.join(base_dir, ".env"))
+    env_file = Path(base_dir, ".env")
+    environ.Env.read_env(env_file)
 
     if settings.configured:
         return

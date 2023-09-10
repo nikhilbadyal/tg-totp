@@ -23,9 +23,7 @@ class ErrorCodes(Enum):
     exceptions = -1
 
 
-def paginate_queryset(
-    queryset: QuerySet[T], page: int, per_page: int
-) -> Dict[str, Any]:
+def paginate_queryset(queryset: QuerySet[T], page: int, per_page: int) -> Dict[str, Any]:
     """Helper function to paginate a given queryset.
 
     Args:
@@ -33,7 +31,8 @@ def paginate_queryset(
         page (int): The current page number.
         per_page (int): The number of items to display per page.
 
-    Returns:
+    Returns
+    -------
         dict: A dictionary containing the paginated data and pagination details.
     """
     paginator = Paginator(queryset, per_page)

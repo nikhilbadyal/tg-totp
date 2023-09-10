@@ -17,16 +17,15 @@ def add_list_handlers(client: TelegramClient) -> None:
 
 def list_usage() -> str:
     """Return the usage of add command."""
-    usage = (
+    return (
         "This command list all the secret available."
         "The results are paginated with default size of **5**."
         "\nPage size is configurable. See `/help settings`"
     )
-    return usage
 
 
-@events.register(events.CallbackQuery(pattern=r"(next|prev)_page:(\d+)"))  # type: ignore
-async def navigate_pages(event: events.callbackquery.CallbackQuery.Event):
+@events.register(events.CallbackQuery(pattern=r"(next|prev)_page:(\d+)"))  # type: ignore[misc]
+async def navigate_pages(event: events.callbackquery.CallbackQuery.Event) -> None:
     """Event handler to navigate between pages of records.
 
     Args:
@@ -41,16 +40,15 @@ async def navigate_pages(event: events.callbackquery.CallbackQuery.Event):
     await event.edit(response, buttons=buttons, parse_mode="markdown")
 
 
-async def send_paginated_records(
-    user: User, page: int
-) -> Tuple[str, List[List[Button]] | None]:
+async def send_paginated_records(user: User, page: int) -> Tuple[str, List[List[Button]] | None]:
     """Fetch and send paginated records for the given user.
 
     Args:
         user (User): The Telegram ID of the user.
         page (int): The current page number.
 
-    Returns:
+    Returns
+    -------
         Tuple[str, List]: A tuple containing the response message and the list of buttons.
     """
     user_settings = user.settings
@@ -82,13 +80,13 @@ async def send_paginated_records(
     buttons.append(extra)
 
     if not buttons[0]:
-        buttons = None  # type: ignore
+        buttons = None  # type: ignore[assignment]
 
     return response, buttons
 
 
 # Register the function to handle the /list command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.LIST.value}$"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.LIST.value}$"))  # type: ignore[misc]
 async def handle_list_command(event: events.NewMessage.Event) -> None:
     """Event handler for the /list command.
 

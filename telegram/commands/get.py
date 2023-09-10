@@ -17,29 +17,29 @@ def add_get_handlers(client: TelegramClient) -> None:
 
 def get_usage() -> str:
     """Return the usage of add command."""
-    usage = (
+    return (
         "/get command expect filter as input to the command.\n"
         "If any URI(s) contain issuer or account name which matches with filter. "
         "It will be returned along with ID and OTP."
     )
-    return usage
 
 
 # Register the function to handle the /get command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.GET.value}(.*)"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.GET.value}(.*)"))  # type: ignore[misc]
 async def handle_get_message(event: events.NewMessage.Event) -> None:
     """Handle /get command.
 
     Args:
         event (events.NewMessage.Event): A new message event.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     try:
         data = event.pattern_match.group(1).strip()
         if not data:
-            raise ValueError()
+            raise ValueError
         user = await get_user(event)
 
         data, size = await Secret.objects.get_secret(user=user, secret_filter=data)

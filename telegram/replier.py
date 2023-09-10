@@ -1,5 +1,8 @@
 """Reply to messages."""
 
+import sys
+from typing import Self
+
 from loguru import logger
 from telethon import TelegramClient
 
@@ -24,9 +27,8 @@ from telegram.utils import CustomMarkdown
 class Telegram(object):
     """A class representing a Telegram bot."""
 
-    def __init__(self, session_file: str):
-        """Create a new Telegram object and connect to the Telegram API using
-        the given session file.
+    def __init__(self: Self, session_file: str) -> None:
+        """Create a new Telegram object and connect to the Telegram API using the given session file.
 
         Args:
             session_file (str): The path to the session file to use for connecting to the Telegram API.
@@ -50,12 +52,10 @@ class Telegram(object):
             logger.info("Using bot authentication. Only bot messages are recognized.")
         else:
             logger.info("Unable to connect with Telegram exiting.")
-            exit(1)
+            sys.exit(1)
 
-    def bot_listener(self) -> None:
-        """Listen for incoming bot messages and handle them based on the
-        command."""
-
+    def bot_listener(self: Self) -> None:
+        """Listen for incoming bot messages and handle them based on the command."""
         # Register event handlers for each command the bot can handle
         add_start_handlers(self.client)
         add_temp_handlers(self.client)

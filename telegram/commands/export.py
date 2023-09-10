@@ -1,6 +1,7 @@
 """Handle export command."""
-import os
-from datetime import datetime
+import contextlib
+from datetime import datetime, timezone
+from pathlib import Path
 
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
@@ -19,48 +20,40 @@ def add_export_handlers(client: TelegramClient) -> None:
 
 def export_usage() -> str:
     """Return the usage of add command."""
-    usage = (
+    return (
         "You can do 2 types of exports.\n"
         "1. If /export command is sent without any input it will export all the uris.\n"
         "2. If /export command is sent with ID the URI will be exported "
         "for that URI. You can get ID from /list or /get "
         "command."
     )
-    return usage
 
 
 # Register the function to handle the /export command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.EXPORT.value}\\s*(\\d*)$"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.EXPORT.value}\\s*(\\d*)$"))  # type: ignore[misc]
 async def handle_export_message(event: events.NewMessage.Event) -> None:
     """Handle /export command.
 
     Args:
         event (events.NewMessage.Event): A new message event.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     message = await event.reply(processing_request)
     data = event.pattern_match.group(1).strip()
-    secret_filter = {}
-    if data:
-        secret_filter = {"id__in": [int(data)]}
+    secret_filter = {"id__in": [int(data)]} if data else {}
     user = await get_user(event)
-    data, size = await Secret.objects.export_secrets(
-        user=user, secret_filter=secret_filter
-    )
+    data, size = await Secret.objects.export_secrets(user=user, secret_filter=secret_filter)
     if size == 0:
         await event.reply(message=no_export)
     else:
-        uris = []
-        for secret in data:
-            uris.append(Secret.objects.export_print(secret))
-        output_file = f"export_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-        with open(output_file, "w", encoding="utf-8") as file:
+        uris = [Secret.objects.export_print(secret) for secret in data]
+        output_file = f"export_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.txt"
+        with Path(output_file).open("w", encoding="utf-8") as file:
             file.write("\n".join(uris))
         await message.delete()
         await event.reply(message=f"Exported {size} URIs.", file=output_file)
-        try:
-            os.remove(output_file)
-        except FileNotFoundError:
-            pass
+        with contextlib.suppress(FileNotFoundError):
+            Path(output_file).unlink()

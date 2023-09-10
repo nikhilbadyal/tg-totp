@@ -1,10 +1,10 @@
 """Handle addurifile command."""
-import os
+from pathlib import Path
 
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
 
-from telegram.exceptions import FileProcessFail
+from telegram.exceptions import FileProcessFailError
 from telegram.strings import file_process_failed, no_input, processing_request
 
 # Import some helper functions
@@ -26,22 +26,19 @@ def add_addurifile_handlers(client: TelegramClient) -> None:
 
 def addurifile_usage() -> str:
     """Return the usage of add command."""
-    usage = (
-        "/addurifile command expects file with the command.\n"
-        "You can also reply to the already sent file."
-    )
-    return usage
+    return "/addurifile command expects file with the command.\nYou can also reply to the already sent file."
 
 
 # Register the function to handle the /addurifile command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.ADDURIFILE.value}$"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.ADDURIFILE.value}$"))  # type: ignore[misc]
 async def handle_addurifile_message(event: events.NewMessage.Event) -> None:
     """Handle /addurifile command.
 
     Args:
         event (events.NewMessage.Event): A new message event.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     message = None
@@ -65,9 +62,9 @@ async def handle_addurifile_message(event: events.NewMessage.Event) -> None:
         if was_failed:
             output_file = import_failure_output_file(failed_secrets)
             await event.reply(file=output_file)
-            os.remove(output_file)
+            Path(output_file).unlink()
     except FileNotFoundError:
         await event.reply(no_input)
-    except FileProcessFail as e:
+    except FileProcessFailError as e:
         if message:
             await message.edit(f"Unable to process\n`{e}`.\n{file_process_failed}")
