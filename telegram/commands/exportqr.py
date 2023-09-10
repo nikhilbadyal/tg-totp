@@ -42,9 +42,7 @@ async def handle_exportqr_message(event: events.NewMessage.Event) -> None:
     """
     message = await event.reply(processing_request)
     data = event.pattern_match.group(1).strip()
-    secret_filter = {}
-    if data:
-        secret_filter = {"id__in": [int(data)]}
+    secret_filter = {"id__in": [int(data)]} if data else {}
     user = await get_user(event)
     data, size = await Secret.objects.export_secrets(user=user, secret_filter=secret_filter)
     if size == 0:
@@ -53,7 +51,7 @@ async def handle_exportqr_message(event: events.NewMessage.Event) -> None:
         qr_meta = {}
         for secret in data:
             uri = Secret.objects.export_print(secret)
-            qr_meta.update({uri: secret})
+            qr_meta[uri] = secret
         zip_file_name = f"{user.id}_{quote_plus(user.name)}"
         os_path = create_qr(qr_meta, zip_file_name)
         await message.delete()

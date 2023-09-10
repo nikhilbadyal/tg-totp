@@ -79,8 +79,10 @@ async def handle_settings_command(event: events.NewMessage.Event) -> None:
     setting_part = 3
     parts = event.message.text.split()
     if len(parts) < setting_part:
-        response = "To update a setting, use the following command format:\n``/settings <setting_name> <value>`\n\n"
-        response += "**For example**:\n`/settings page_size 5`\n\n"
+        response = (
+            "To update a setting, use the following command format:\n``/settings <setting_name> <value>`\n\n"
+            + "**For example**:\n`/settings page_size 5`\n\n"
+        )
         response += "Click the **List Settings** button below to see available settings."
 
         buttons = [
@@ -102,8 +104,9 @@ async def handle_settings_command(event: events.NewMessage.Event) -> None:
         UserSettings.PAGE_SIZE.value: modify_page_size,
     }
 
-    setting_modification_function = settings_modification_functions.get(setting_name.lower())
-    if setting_modification_function:
+    if setting_modification_function := settings_modification_functions.get(
+        setting_name.lower()
+    ):
         await setting_modification_function(event, user, user_settings, new_value)
     else:
         await event.reply(
