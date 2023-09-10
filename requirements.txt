@@ -1,15 +1,14 @@
-django==4.2.3 #https://github.com/django/django
-django-environ==0.10.0 #https://github.com/joke2k/django-environ
+django==4.2.5 #https://github.com/django/django
 environs==9.5.0 #https://github.com/sloria/environs
-loguru==0.7.0 #https://github.com/Delgan/loguru
-pre-commit==3.3.3 #https://github.com/pre-commit/pre-commit
-psycopg2-binary==2.9.6   # https://github.com/psycopg/psycopg2
+loguru==0.7.1 #https://github.com/Delgan/loguru
+pre-commit==3.4.0 #https://github.com/pre-commit/pre-commit
+psycopg2-binary==2.9.7   # https://github.com/psycopg/psycopg2
 pyotp==2.9.0 #https://pypi.org/project/pyotp/
 pytest-cov==4.1.0 #https://github.com/pytest-dev/pytest-cov
 pytest-django==4.5.2
-pytest-html==3.2.0  #https://github.com/pytest-dev/pytest-html
+pytest-html==4.0.0  #https://github.com/pytest-dev/pytest-html
 pytest-sugar==0.9.7  # https://github.com/Frozenball/pytest-sugar
 qrcode[pil]==7.4.2  #https://github.com/lincolnloop/python-qrcode
 requests==2.31.0 #https://github.com/psf/requests
-telethon==1.29.2 #https://github.com/LonamiWebs/Telethon
+telethon==1.29.3 #https://github.com/LonamiWebs/Telethon
 watchdog==3.0.0 #https://github.com/gorakhargosh/watchdog

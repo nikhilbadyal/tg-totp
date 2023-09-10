@@ -17,19 +17,18 @@ def add_settings_handlers(client: TelegramClient) -> None:
 
 def settings_usage() -> str:
     """Return the usage of add command."""
-    usage = (
+    return (
         "This command help you in listing or modifying settings.\n"
         "To update a setting, use the following command in format:\n"
         "`/settings <setting_name> <value>`\n\n"
         "** For example **:\n`/settings page_size 5`\n\n"
     )
-    return usage
 
 
-@events.register(events.CallbackQuery(pattern="list_settings"))  # type: ignore
+@events.register(events.CallbackQuery(pattern="list_settings"))  # type: ignore[misc]
 async def handle_settings_list_settings(
     event: events.callbackquery.CallbackQuery.Event,
-):
+) -> None:
     """Event handler for listing available settings.
 
     Args:
@@ -44,10 +43,10 @@ async def handle_settings_list_settings(
     await event.edit(response, parse_mode="markdown")
 
 
-@events.register(events.CallbackQuery(pattern="current_settings"))  # type: ignore
+@events.register(events.CallbackQuery(pattern="current_settings"))  # type: ignore[misc]
 async def handle_settings_current_settings(
     event: events.callbackquery.CallbackQuery.Event,
-):
+) -> None:
     """Event handler for listing current settings.
 
     Args:
@@ -69,22 +68,20 @@ async def handle_settings_current_settings(
     await event.edit(response, parse_mode="markdown")
 
 
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.SETTINGS.value}"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.SETTINGS.value}"))  # type: ignore[misc]
 async def handle_settings_command(event: events.NewMessage.Event) -> None:
     """Event handler for the /settings command.
 
     Args:
         event (NewMessage.Event): The new message event.
     """
-
     # Extract the setting name and new value from the input message
+    setting_part = 3
     parts = event.message.text.split()
-    if len(parts) < 3:
+    if len(parts) < setting_part:
         response = "To update a setting, use the following command format:\n``/settings <setting_name> <value>`\n\n"
         response += "**For example**:\n`/settings page_size 5`\n\n"
-        response += (
-            "Click the **List Settings** button below to see available settings."
-        )
+        response += "Click the **List Settings** button below to see available settings."
 
         buttons = [
             Button.inline("List Settings", data="list_settings"),
@@ -105,9 +102,7 @@ async def handle_settings_command(event: events.NewMessage.Event) -> None:
         UserSettings.PAGE_SIZE.value: modify_page_size,
     }
 
-    setting_modification_function = settings_modification_functions.get(
-        setting_name.lower()
-    )
+    setting_modification_function = settings_modification_functions.get(setting_name.lower())
     if setting_modification_function:
         await setting_modification_function(event, user, user_settings, new_value)
     else:

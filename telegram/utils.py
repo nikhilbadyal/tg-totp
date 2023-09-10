@@ -6,7 +6,7 @@ from enum import Enum
 from functools import reduce
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Self, Tuple
 from urllib.parse import quote_plus
 from zipfile import ZipFile
 
@@ -23,11 +23,12 @@ from telethon.extensions import markdown
 from telethon.tl.types import User as TelegramUser
 
 from sqlitedb.models import Secret, User
-from telegram.exceptions import DuplicateSecret, FileProcessFail, InvalidSecret
+from telegram.exceptions import DuplicateSecretError, FileProcessFailError, InvalidSecretError, TGOtpError
 from telegram.strings import added_secret, no_input
 
 # Number of records per page
 PAGE_SIZE = 10
+MIN_PAGE_SIZE = 1
 
 
 class CustomMarkdown:
@@ -42,9 +43,7 @@ class CustomMarkdown:
                 if e.url == "spoiler":
                     entities[i] = types.MessageEntitySpoiler(e.offset, e.length)
                 elif e.url.startswith("emoji/"):
-                    entities[i] = types.MessageEntityCustomEmoji(
-                        e.offset, e.length, int(e.url.split("/")[1])
-                    )
+                    entities[i] = types.MessageEntityCustomEmoji(e.offset, e.length, int(e.url.split("/")[1]))
         return text, entities
 
     @staticmethod
@@ -52,9 +51,7 @@ class CustomMarkdown:
         """Unparse."""
         for i, e in enumerate(entities or []):
             if isinstance(e, types.MessageEntityCustomEmoji):
-                entities[i] = types.MessageEntityTextUrl(
-                    e.offset, e.length, f"emoji/{e.document_id}"
-                )
+                entities[i] = types.MessageEntityTextUrl(e.offset, e.length, f"emoji/{e.document_id}")
             if isinstance(e, types.MessageEntitySpoiler):
                 entities[i] = types.MessageEntityTextUrl(e.offset, e.length, "spoiler")
         return markdown.unparse(text, entities)
@@ -80,21 +77,23 @@ class SupportedCommands(Enum):
     HELP: str = "/help"
 
     @classmethod
-    def get_values(cls) -> List[str]:
+    def get_values(cls: Any) -> List[str]:
         """Returns a list of all the values of the SupportedCommands enum.
 
-        Returns:
+        Returns
+        -------
             list: A list of all the values of the SupportedCommands enum.
         """
         return [command.value for command in cls]
 
-    def __str__(self) -> str:
+    def __str__(self: Self) -> str:
         """Returns the string representation of the enum value.
 
-        Returns:
+        Returns
+        -------
             str: The string representation of the enum value.
         """
-        return self.value
+        return str(self.value)
 
 
 async def get_telegram_user(event: events.NewMessage.Event) -> TelegramUser:
@@ -103,7 +102,8 @@ async def get_telegram_user(event: events.NewMessage.Event) -> TelegramUser:
     Args:
         event (events.NewMessage.Event): The message event.
 
-    Returns:
+    Returns
+    -------
         User: The User entity associated with the message event.
     """
     try:
@@ -116,15 +116,14 @@ async def get_telegram_user(event: events.NewMessage.Event) -> TelegramUser:
 
 
 def get_regex() -> str:
-    """Generate a regex pattern that matches any message that is not a
-    supported command.
+    """Generate a regex pattern that matches any message that is not a supported command.
 
-    Returns:
+    Returns
+    -------
         str: A regex pattern as a string.
     """
     # Exclude any message that starts with one of the supported commands using negative lookahead
-    pattern = r"^(?!(%s))[/].*" % "|".join(SupportedCommands.get_values())
-    return pattern
+    return r"^(?!(%s))[/].*" % "|".join(SupportedCommands.get_values())
 
 
 class UserSettings(Enum):
@@ -132,23 +131,26 @@ class UserSettings(Enum):
 
     PAGE_SIZE = "page_size", "The number of records displayed per page."
 
-    def __new__(cls, *args: Any, **kwds: Any) -> "UserSettings":
+    def __new__(cls: Any, *args: Any, **_: Any) -> Any:
+        """Create a new User settings."""
         obj = object.__new__(cls)
         obj._value_ = args[0]
         return obj
 
     # ignore the first param since it's already set by __new__
-    def __init__(self, _: str, description: Optional[str] = None):
+    def __init__(self: Self, _: str, description: Optional[str] = None) -> None:
         self._description_ = description
 
-    def __str__(self) -> str:
+    def __str__(self: Self) -> str:
+        """Returns a string representation."""
         return str(self.value)
 
     @property
-    def description(self) -> Optional[str]:
+    def description(self: Self) -> Optional[str]:
         """Returns the description of the setting.
 
-        Returns:
+        Returns
+        -------
             Optional[str]: The description of the setting.
         """
         return self._description_
@@ -181,9 +183,10 @@ def is_valid_2fa_secret(secret: str) -> bool:
     try:
         # Attempt to create a TOTP object based on the provided secret
         pyotp.TOTP(secret).now()
+    except TGOtpError as e:
+        raise InvalidSecretError from e
+    else:
         return True
-    except Exception:
-        raise InvalidSecret()
 
 
 async def add_secret_data(secret_data: Dict[str, str], user: User) -> str:
@@ -204,7 +207,7 @@ async def bulk_add_secret_data(
         try:
             await add_secret_data(secret_data, user)
             import_status["success"] += 1
-        except DuplicateSecret:
+        except DuplicateSecretError:
             import_status["duplicate"] += 1
             failed_secrets["duplicate"].append(secret_data)
     return import_status, failed_secrets
@@ -219,22 +222,21 @@ async def get_uri_file_from_message(event: events.NewMessage.Event) -> str:
         replied_msg = await event.message.get_reply_message()
         temp_file = await replied_msg.download_media()
     if not temp_file:
-        raise FileNotFoundError()
-    return temp_file  # type: ignore
+        raise FileNotFoundError
+    return str(temp_file)
 
 
 def process_uri_file(temp_file: str) -> List[str]:
     """Process URI file."""
-    uris = []
     try:
-        with open(temp_file) as uri_file:
-            for uri in uri_file:
-                uris.append(uri.strip())
+        with Path(temp_file).open() as uri_file:
+            uris = [uri.strip() for uri in uri_file]
+    except TGOtpError as e:
+        raise FileProcessFailError from e
+    else:
         return uris
-    except Exception:
-        raise FileProcessFail()
     finally:
-        os.remove(temp_file)
+        Path(temp_file).unlink()
 
 
 def extract_secret_from_uri(
@@ -249,7 +251,7 @@ def extract_secret_from_uri(
         try:
             secret_data = OTP.parse_uri(uri)
             secrets.append(secret_data)
-        except InvalidSecret as e:
+        except InvalidSecretError as e:
             failed["invalid"].append({"uri": uri, "reason": str(e)})
     return secrets, failed
 
@@ -257,7 +259,7 @@ def extract_secret_from_uri(
 def import_failure_output_file(import_failures: Dict[str, List[Dict[str, str]]]) -> str:
     """Prepare failed record file."""
     output_file = "output-data.json"
-    with open(output_file, "w", encoding="utf-8") as f:
+    with Path(output_file).open("w", encoding="utf-8") as f:
         json.dump(import_failures, f, ensure_ascii=False, indent=2)
     return output_file
 
@@ -265,23 +267,21 @@ def import_failure_output_file(import_failures: Dict[str, List[Dict[str, str]]])
 async def get_user(event: events.NewMessage.Event) -> User:
     """Get out user from telegram user."""
     telegram_user: TelegramUser = await get_telegram_user(event)
-    user = await User.objects.get_user(telegram_user=telegram_user)
-    return user
+    return await User.objects.get_user(telegram_user=telegram_user)
 
 
 def or_filters(filters: Dict[str, Any]) -> List[Any]:
     """Prepare queryset fileter from dict."""
     try:
         filtered_or = [Q(**{key: val}) for key, val in filters.items()]
-        return reduce(operator.or_, filtered_or)  # type: ignore
+        return reduce(operator.or_, filtered_or)  # type: ignore[arg-type]
     except TypeError:
         return []
 
 
 def prepare_user_filter(user: User) -> Dict[str, Any]:
     """Prepare queryset fileter for user."""
-    queryset_filters = {"user__in": [user]}
-    return queryset_filters
+    return {"user__in": [user]}
 
 
 def create_qr(uris: Dict[str, Secret], zip_file_name: str) -> Path:
@@ -300,20 +300,16 @@ def create_qr(uris: Dict[str, Secret], zip_file_name: str) -> Path:
             f"{folder_name}/{file_name}",
         )
     if len(uris) < 1:
-        visible_files = [
-            file
-            for file in Path(folder_name).iterdir()
-            if not file.name.startswith(".")
-        ]
+        visible_files = [file for file in Path(folder_name).iterdir() if not file.name.startswith(".")]
         return visible_files[0]
     zip_name = f"{zip_file_name}.zip"
     # Create object of ZipFile
     with ZipFile(zip_name, "w") as zip_object:
         # Traverse all files in directory
-        for folder_name, sub_folders, file_names in os.walk(folder_name):
+        for foldername, _sub_folders, file_names in os.walk(folder_name):
             for filename in file_names:
-                file_path = os.path.join(folder_name, filename)
-                zip_object.write(file_path, os.path.basename(file_path))
+                file_path = Path(foldername, filename)
+                zip_object.write(file_path, Path(file_path).name)
     all_files(Path(folder_name))
     return Path(zip_name)
 

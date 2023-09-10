@@ -5,7 +5,7 @@ from telethon import events
 
 from sqlitedb.models import User
 from telegram.strings import invalid_page_size, page_size_updated
-from telegram.utils import UserSettings
+from telegram.utils import MIN_PAGE_SIZE, PAGE_SIZE, UserSettings
 
 
 async def modify_page_size(
@@ -24,8 +24,8 @@ async def modify_page_size(
     """
     try:
         page_size = int(new_value)
-        if page_size < 1 or page_size > 10:
-            raise ValueError()
+        if page_size < MIN_PAGE_SIZE or page_size > PAGE_SIZE:
+            raise ValueError
 
         user_settings[UserSettings.PAGE_SIZE.value] = str(page_size)
         user.settings = user_settings

@@ -2,19 +2,17 @@
 from django.db.utils import IntegrityError
 
 
-class DuplicateSecret(IntegrityError):
+class TGOtpError(Exception):
+    """Base Project Error."""
+
+
+class DuplicateSecretError(IntegrityError):
     """Duplicate Secret."""
 
-    pass
 
-
-class InvalidSecret(ValueError):
+class InvalidSecretError(ValueError):
     """Invalid Secret."""
 
-    pass
 
-
-class FileProcessFail(ValueError):
+class FileProcessFailError(ValueError):
     """Invalid Secret."""
-
-    pass

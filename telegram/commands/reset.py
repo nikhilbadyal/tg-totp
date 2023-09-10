@@ -24,17 +24,13 @@ def add_reset_handlers(client: TelegramClient) -> None:
 
 def reset_usage() -> str:
     """Return the usage of add command."""
-    usage = (
-        "This command will help you in cleaning up all the secrets."
-        "It doesn't expect any arguments."
-    )
-    return usage
+    return "This command will help you in cleaning up all the secrets.It doesn't expect any arguments."
 
 
-@events.register(events.callbackquery.CallbackQuery(pattern="^reset_(yes|no)$"))  # type: ignore
+@events.register(events.callbackquery.CallbackQuery(pattern="^reset_(yes|no)$"))  # type: ignore[misc]
 async def handle_reset_confirm_response(
     event: events.callbackquery.CallbackQuery.Event,
-):
+) -> None:
     """Handle reset confirmation response.
 
     This function is registered as an event handler to handle the callback query
@@ -46,7 +42,8 @@ async def handle_reset_confirm_response(
     Args:
         event (events.callbackquery.CallbackQuery.Event): The event object associated with the callback query.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     await event.answer()
@@ -60,17 +57,17 @@ async def handle_reset_confirm_response(
 
 
 # Register the function to handle the /reset command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.RESET.value}$"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.RESET.value}$"))  # type: ignore[misc]
 async def handle_reset_command(event: events.NewMessage.Event) -> None:
     """Handle /reset command Delete all message history for a user.
 
     Args:
         event (events.NewMessage.Event): A new message event.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
-
     # Log that a request has been received to delete all user data
     logger.debug("Received request to delete all user secrets.")
 
