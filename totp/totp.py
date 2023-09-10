@@ -33,10 +33,9 @@ class OTP(object):
         try:
             otp = pyotp.parse_uri(secret_uri)
             data_points = Secret.objects.possible_inputs()
-            secret_data = {}
-            for data, my_data in data_points.items():
-                if getattr(otp, data, None):
-                    secret_data.update({my_data: str(getattr(otp, data))})
+            secret_data = {
+                my_data: str(getattr(otp, data)) for data, my_data in data_points.items() if getattr(otp, data, None)
+            }
         except ValueError as e:
             raise InvalidSecretError(e) from e
         else:

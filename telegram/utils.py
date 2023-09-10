@@ -123,7 +123,7 @@ def get_regex() -> str:
         str: A regex pattern as a string.
     """
     # Exclude any message that starts with one of the supported commands using negative lookahead
-    return r"^(?!(%s))[/].*" % "|".join(SupportedCommands.get_values())
+    return f'^(?!({"|".join(SupportedCommands.get_values())}))[/].*'
 
 
 class UserSettings(Enum):
@@ -299,7 +299,7 @@ def create_qr(uris: Dict[str, Secret], zip_file_name: str) -> Path:
         qr_code.save(
             f"{folder_name}/{file_name}",
         )
-    if len(uris) < 1:
+    if not uris:
         visible_files = [file for file in Path(folder_name).iterdir() if not file.name.startswith(".")]
         return visible_files[0]
     zip_name = f"{zip_file_name}.zip"
