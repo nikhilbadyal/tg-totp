@@ -1,6 +1,5 @@
 """TOTP generator."""
 import datetime
-from typing import Dict
 
 import pyotp
 
@@ -19,7 +18,7 @@ class OTP(object):
             is_valid_2fa_secret(secret)
             totp = pyotp.TOTP(secret)
             otp = str(totp.now())
-            utc = datetime.timezone.utc
+            utc = datetime.UTC
             curr_time = datetime.datetime.now(utc)
             time_left = int(totp.interval - curr_time.timestamp() % totp.interval)
             time_remaining = datetime.timedelta(seconds=time_left)
@@ -28,7 +27,7 @@ class OTP(object):
             raise InvalidSecretError from e
 
     @staticmethod
-    def parse_uri(secret_uri: str) -> Dict[str, str]:
+    def parse_uri(secret_uri: str) -> dict[str, str]:
         """Generate TOTP."""
         try:
             otp = pyotp.parse_uri(secret_uri)

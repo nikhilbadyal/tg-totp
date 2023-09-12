@@ -1,5 +1,5 @@
 """Models."""
-from typing import Any, Dict, Self, Tuple
+from typing import Any, Self
 from urllib.parse import quote
 
 from django.db import IntegrityError, models
@@ -109,7 +109,7 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
         except IntegrityError as e:
             raise DuplicateSecretError from e
 
-    def possible_inputs(self: Self) -> Dict[str, str]:
+    def possible_inputs(self: Self) -> dict[str, str]:
         """Possible input."""
         return {
             "secret": "secret",
@@ -145,7 +145,7 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
         # Use the helper function to paginate the queryset
         return paginate_queryset(data, page, per_page)
 
-    async def get_secret(self: Self, user: User, secret_filter: str) -> Tuple[Any, int]:
+    async def get_secret(self: Self, user: User, secret_filter: str) -> tuple[Any, int]:
         """Return a paginated list of secrets for a given user.
 
         Args:
@@ -166,7 +166,7 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
         except self.model.DoesNotExist:
             return [], 0
 
-    async def export_secrets(self: Self, user: User, secret_filter: Dict[str, Any]) -> Tuple[Any, int]:
+    async def export_secrets(self: Self, user: User, secret_filter: dict[str, Any]) -> tuple[Any, int]:
         """Return all secrets for a given user.
 
         Args:

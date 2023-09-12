@@ -6,7 +6,7 @@ from enum import Enum
 from functools import reduce
 from pathlib import Path
 from shutil import rmtree
-from typing import Any, Dict, List, Optional, Self, Tuple
+from typing import Any, Self
 from urllib.parse import quote_plus
 from zipfile import ZipFile
 
@@ -77,7 +77,7 @@ class SupportedCommands(Enum):
     HELP: str = "/help"
 
     @classmethod
-    def get_values(cls: Any) -> List[str]:
+    def get_values(cls: Any) -> list[str]:
         """Returns a list of all the values of the SupportedCommands enum.
 
         Returns
@@ -138,7 +138,7 @@ class UserSettings(Enum):
         return obj
 
     # ignore the first param since it's already set by __new__
-    def __init__(self: Self, _: str, description: Optional[str] = None) -> None:
+    def __init__(self: Self, _: str, description: str | None = None) -> None:
         self._description_ = description
 
     def __str__(self: Self) -> str:
@@ -146,7 +146,7 @@ class UserSettings(Enum):
         return str(self.value)
 
     @property
-    def description(self: Self) -> Optional[str]:
+    def description(self: Self) -> str | None:
         """Returns the description of the setting.
 
         Returns
@@ -156,7 +156,7 @@ class UserSettings(Enum):
         return self._description_
 
 
-def parse_secret(secret_string: str) -> Dict[str, str]:
+def parse_secret(secret_string: str) -> dict[str, str]:
     """Parse Secret."""
     # Split the input string into key-value pairs
     key_value_pairs = secret_string.split(",")
@@ -189,7 +189,7 @@ def is_valid_2fa_secret(secret: str) -> bool:
         return True
 
 
-async def add_secret_data(secret_data: Dict[str, str], user: User) -> str:
+async def add_secret_data(secret_data: dict[str, str], user: User) -> str:
     """Add secret data."""
     is_valid_2fa_secret(secret_data["secret"])
     # Get the user associated with the message
@@ -198,11 +198,12 @@ async def add_secret_data(secret_data: Dict[str, str], user: User) -> str:
 
 
 async def bulk_add_secret_data(
-    secrets: List[Dict[str, str]], user: User
-) -> Tuple[Dict[str, int], Dict[str, List[Dict[str, str]]]]:
+    secrets: list[dict[str, str]],
+    user: User,
+) -> tuple[dict[str, int], dict[str, list[dict[str, str]]]]:
     """Add secret data."""
     import_status = {"invalid": 0, "duplicate": 0, "success": 0}
-    failed_secrets: Dict[str, List[Dict[str, str]]] = {"invalid": [], "duplicate": []}
+    failed_secrets: dict[str, list[dict[str, str]]] = {"invalid": [], "duplicate": []}
     for secret_data in secrets:
         try:
             await add_secret_data(secret_data, user)
@@ -226,7 +227,7 @@ async def get_uri_file_from_message(event: events.NewMessage.Event) -> str:
     return str(temp_file)
 
 
-def process_uri_file(temp_file: str) -> List[str]:
+def process_uri_file(temp_file: str) -> list[str]:
     """Process URI file."""
     try:
         with Path(temp_file).open() as uri_file:
@@ -240,13 +241,13 @@ def process_uri_file(temp_file: str) -> List[str]:
 
 
 def extract_secret_from_uri(
-    uris: List[str],
-) -> Tuple[List[Dict[str, str]], Dict[str, List[Dict[str, str]]]]:
+    uris: list[str],
+) -> tuple[list[dict[str, str]], dict[str, list[dict[str, str]]]]:
     """Extract secrets from URI."""
     from totp.totp import OTP
 
     secrets = []
-    failed: Dict[str, List[Dict[str, str]]] = {"invalid": []}
+    failed: dict[str, list[dict[str, str]]] = {"invalid": []}
     for uri in uris:
         try:
             secret_data = OTP.parse_uri(uri)
@@ -256,7 +257,7 @@ def extract_secret_from_uri(
     return secrets, failed
 
 
-def import_failure_output_file(import_failures: Dict[str, List[Dict[str, str]]]) -> str:
+def import_failure_output_file(import_failures: dict[str, list[dict[str, str]]]) -> str:
     """Prepare failed record file."""
     output_file = "output-data.json"
     with Path(output_file).open("w", encoding="utf-8") as f:
@@ -270,7 +271,7 @@ async def get_user(event: events.NewMessage.Event) -> User:
     return await User.objects.get_user(telegram_user=telegram_user)
 
 
-def or_filters(filters: Dict[str, Any]) -> List[Any]:
+def or_filters(filters: dict[str, Any]) -> list[Any]:
     """Prepare queryset fileter from dict."""
     try:
         filtered_or = [Q(**{key: val}) for key, val in filters.items()]
@@ -279,12 +280,12 @@ def or_filters(filters: Dict[str, Any]) -> List[Any]:
         return []
 
 
-def prepare_user_filter(user: User) -> Dict[str, Any]:
+def prepare_user_filter(user: User) -> dict[str, Any]:
     """Prepare queryset fileter for user."""
     return {"user__in": [user]}
 
 
-def create_qr(uris: Dict[str, Secret], zip_file_name: str) -> Path:
+def create_qr(uris: dict[str, Secret], zip_file_name: str) -> Path:
     """Create qr image from uris list."""
     folder_name = "qrexports/"
     for uri, secret in uris.items():

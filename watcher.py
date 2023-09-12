@@ -3,7 +3,7 @@ import os
 import subprocess
 import sys
 import time
-from typing import Any, List, Optional, Self
+from typing import Any, Self
 
 from watchdog.events import FileModifiedEvent, FileSystemEventHandler
 from watchdog.observers import Observer
@@ -12,13 +12,13 @@ from watchdog.observers import Observer
 class MyHandler(FileSystemEventHandler):  # type: ignore[misc]
     """Watcher file update handler."""
 
-    def __init__(self: Self, excluded_dir: List[str]) -> None:
+    def __init__(self: Self, excluded_dir: list[str]) -> None:
         """Initialize the handler and start the main script process.
 
         Args:
             excluded_dir: A list of excluded directory names.
         """
-        self.process: Optional[subprocess.Popen[Any]] = None
+        self.process: subprocess.Popen[Any] | None = None
         self.excluded_directories = excluded_dir
         self.start_process()
 
@@ -32,9 +32,9 @@ class MyHandler(FileSystemEventHandler):  # type: ignore[misc]
 
         # Check if the modified file is not in the excluded directories and has a .py extension
         if all(directory not in path_components for directory in self.excluded_directories) and event.src_path.endswith(
-            ".py"
+            ".py",
         ):
-            print(f"File modified {event.src_path}, restarting...")
+            print(f"File modified {event.src_path}, restarting...")  # noqa: T201
             self.restart_process()
 
     def start_process(self: Self) -> None:

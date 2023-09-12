@@ -1,6 +1,6 @@
 """Handle export command."""
 import contextlib
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 # Import necessary libraries and modules
@@ -50,7 +50,7 @@ async def handle_export_message(event: events.NewMessage.Event) -> None:
         await event.reply(message=no_export)
     else:
         uris = [Secret.objects.export_print(secret) for secret in data]
-        output_file = f"export_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.txt"
+        output_file = f"export_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}.txt"
         with Path(output_file).open("w", encoding="utf-8") as file:
             file.write("\n".join(uris))
         await message.delete()

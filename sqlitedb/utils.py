@@ -1,6 +1,6 @@
 """Utility class."""
 from enum import Enum
-from typing import Any, Dict, TypeVar
+from typing import Any, TypeVar
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Model, QuerySet
@@ -23,7 +23,7 @@ class ErrorCodes(Enum):
     exceptions = -1
 
 
-def paginate_queryset(queryset: QuerySet[T], page: int, per_page: int) -> Dict[str, Any]:
+def paginate_queryset(queryset: QuerySet[T], page: int, per_page: int) -> dict[str, Any]:
     """Helper function to paginate a given queryset.
 
     Args:

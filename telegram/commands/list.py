@@ -1,5 +1,4 @@
 """List User Conversation."""
-from typing import List, Tuple
 
 from asgiref.sync import sync_to_async
 from loguru import logger
@@ -40,7 +39,7 @@ async def navigate_pages(event: events.callbackquery.CallbackQuery.Event) -> Non
     await event.edit(response, buttons=buttons, parse_mode="markdown")
 
 
-async def send_paginated_records(user: User, page: int) -> Tuple[str, List[List[Button]] | None]:
+async def send_paginated_records(user: User, page: int) -> tuple[str, list[list[Button]] | None]:
     """Fetch and send paginated records for the given user.
 
     Args:
@@ -64,7 +63,7 @@ async def send_paginated_records(user: User, page: int) -> Tuple[str, List[List[
     response += f"\nPage {result['current_page']} of {result['total_pages']}"
     response += f"\n[Total records {result['total_data']}](spoiler)"
 
-    buttons: List[List[Button]] = []
+    buttons: list[list[Button]] = []
     main_button = []
     if result["has_previous"]:
         main_button.append(Button.inline("Previous", data=f"prev_page:{page - 1}"))

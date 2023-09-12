@@ -1,5 +1,4 @@
 """User Settings modifications."""
-from typing import Dict
 
 from telethon import events
 
@@ -11,7 +10,7 @@ from telegram.utils import MIN_PAGE_SIZE, PAGE_SIZE, UserSettings
 async def modify_page_size(
     event: events.NewMessage.Event,
     user: User,
-    user_settings: Dict[str, str],
+    user_settings: dict[str, str],
     new_value: str,
 ) -> None:
     """Modify the page_size setting for a user.
