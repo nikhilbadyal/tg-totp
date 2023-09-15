@@ -7,7 +7,7 @@ psycopg2-binary==2.9.7   # https://github.com/psycopg/psycopg2
 pyotp==2.9.0 #https://pypi.org/project/pyotp/
 pytest-cov==4.1.0 #https://github.com/pytest-dev/pytest-cov
 pytest-django==4.5.2
-pytest-html==4.0.1  #https://github.com/pytest-dev/pytest-html
+pytest-html==4.0.2  #https://github.com/pytest-dev/pytest-html
 pytest-sugar==0.9.7  # https://github.com/Frozenball/pytest-sugar
 qrcode[pil]==7.4.2  #https://github.com/lincolnloop/python-qrcode
 requests==2.31.0 #https://github.com/psf/requests
