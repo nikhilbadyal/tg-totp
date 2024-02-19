@@ -1,4 +1,5 @@
 """Models."""
+
 from typing import Any, Self
 from urllib.parse import quote
 

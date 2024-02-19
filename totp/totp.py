@@ -1,4 +1,5 @@
 """TOTP generator."""
+
 import datetime
 
 import pyotp
