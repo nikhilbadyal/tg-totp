@@ -1,4 +1,5 @@
 """Handle temp command."""
+
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
 

@@ -1,4 +1,5 @@
 """Handle exportqr command."""
+
 import contextlib
 from pathlib import Path
 from urllib.parse import quote_plus

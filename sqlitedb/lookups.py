@@ -1,4 +1,5 @@
 """Custom Lookups."""
+
 from typing import Any, Self
 
 from django.db.models import Lookup
