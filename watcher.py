@@ -1,4 +1,5 @@
 """Restart on code changes."""
+
 import os
 import subprocess
 import sys

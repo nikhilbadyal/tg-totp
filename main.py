@@ -1,4 +1,5 @@
 """Main function."""
+
 from environs import Env
 from loguru import logger
 

@@ -1,4 +1,5 @@
 """Models."""
+
 from typing import Any, Self
 from urllib.parse import quote
 
@@ -236,15 +237,8 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
             str: String repr of secret.
         """
         return (
-            "otpauth://totp/{issuer}%3A{account}?period={period}&digits={digits}&"
-            "algorithm={algorithm}&secret={secret}&issuer={issuer}"
-        ).format(
-            issuer=quote(secret.issuer.strip()),
-            account=quote(secret.account_id.strip()),
-            period=secret.period,
-            digits=secret.digits,
-            algorithm=secret.algorithm.strip(),
-            secret=secret.secret.strip(),
+            f"otpauth://totp/{quote(secret.issuer.strip())}%3A{quote(secret.account_id.strip())}?period={secret.period}&digits={secret.digits}&"
+            f"algorithm={secret.algorithm.strip()}&secret={secret.secret.strip()}&issuer={quote(secret.issuer.strip())}"
         )
 
     async def clear_user_secrets(self: Self, user: User) -> int:

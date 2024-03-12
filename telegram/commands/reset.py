@@ -1,4 +1,5 @@
 """Handle Reset Command."""
+
 from loguru import logger
 
 # Import necessary libraries and modules
