@@ -4,6 +4,8 @@ import contextlib
 from datetime import UTC, datetime
 from pathlib import Path
 
+import aiofiles
+
 # Import necessary libraries and modules
 from telethon import TelegramClient, events
 
@@ -52,8 +54,8 @@ async def handle_export_message(event: events.NewMessage.Event) -> None:
     else:
         uris = [Secret.objects.export_print(secret) for secret in data]
         output_file = f"export_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}.txt"
-        with Path(output_file).open("w", encoding="utf-8") as file:
-            file.write("\n".join(uris))
+        async with aiofiles.open(output_file, mode="w") as file:
+            await file.write("\n".join(uris))
         await message.delete()
         await event.reply(message=f"Exported {size} URIs.", file=output_file)
         with contextlib.suppress(FileNotFoundError):
