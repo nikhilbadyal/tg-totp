@@ -252,9 +252,6 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
         return deleted  # type: ignore[no-any-return]
 
 
-#
-
-
 class Secret(models.Model):
     """Model to store secrets."""
 
