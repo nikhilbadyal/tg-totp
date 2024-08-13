@@ -48,11 +48,11 @@ async def handle_export_message(event: events.NewMessage.Event) -> None:
     data = event.pattern_match.group(1).strip()
     secret_filter = {"id__in": [int(data)]} if data else {}
     user = await get_user(event)
-    data, size = await Secret.objects.export_secrets(user=user, secret_filter=secret_filter)
+    data, size = await Secret.objects.export_secrets(user=user, secret_filter=secret_filter)  # type: ignore[misc]
     if size == 0:
         await event.reply(message=no_export)
     else:
-        uris = [Secret.objects.export_print(secret) for secret in data]
+        uris = [Secret.objects.export_print(secret) for secret in data]  # type: ignore[misc]
         output_file = f"export_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}.txt"
         async with aiofiles.open(output_file, mode="w") as file:
             await file.write("\n".join(uris))

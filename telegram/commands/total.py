@@ -35,5 +35,5 @@ async def handle_total_message(event: events.NewMessage.Event) -> None:
         None: This function doesn't return anything.
     """
     user = await get_user(event)
-    size = await Secret.objects.total_secrets(user=user)
+    size = await Secret.objects.total_secrets(user=user)  # type: ignore[misc]
     await event.reply(f"There are {size} secrets in total.")
