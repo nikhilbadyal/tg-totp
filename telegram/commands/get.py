@@ -42,11 +42,11 @@ async def handle_get_message(event: events.NewMessage.Event) -> None:
             raise ValueError
         user = await get_user(event)
 
-        data, size = await Secret.objects.get_secret(user=user, secret_filter=data)
+        data, size = await Secret.objects.get_secret(user=user, secret_filter=data)  # type: ignore[misc]
         if size > 0:
             response = f"Here are the TOTP for **{size}** found secrets.\n\n"
             for secret in data:
-                response += f"➡️ {Secret.objects.reduced_print(secret)}\n"
+                response += f"➡️ {Secret.objects.reduced_print(secret)}\n"  # type: ignore[misc]
             await event.reply(response)
         else:
             await event.reply(no_result)
