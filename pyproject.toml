@@ -16,6 +16,7 @@ ignore = [
     "UP004", #useless-object-inheritance
     "PLR0911", #too many returns
     "A003",
+    "PGH003",
 
 ]
 fix = true

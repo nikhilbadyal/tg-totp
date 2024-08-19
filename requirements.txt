@@ -2,6 +2,7 @@ aiofiles==24.1.0 #https://github.com/Tinche/aiofiles
 django==5.1 #https://github.com/django/django
 django-environ==0.11.2  #https://github.com/joke2k/django-environ
 django-stubs[compatible-mypy] #https://github.com/typeddjango/django-stubs
+environs==11.0.0
 loguru==0.7.2 #https://github.com/Delgan/loguru
 pre-commit==3.8.0 #https://github.com/pre-commit/pre-commit
 psycopg2-binary==2.9.9   # https://github.com/psycopg/psycopg2
@@ -14,4 +15,3 @@ qrcode[pil]==7.4.2  #https://github.com/lincolnloop/python-qrcode
 requests==2.32.3 #https://github.com/psf/requests
 telethon==1.36.0 #https://github.com/LonamiWebs/Telethon
 watchdog==4.0.2 #https://github.com/gorakhargosh/watchdog
-environs==11.0.0

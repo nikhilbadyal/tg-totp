@@ -3,6 +3,7 @@
 from typing import Any, Self
 from urllib.parse import quote
 
+from asgiref.sync import sync_to_async
 from django.db import IntegrityError, models
 from django.db.models import Field
 from telethon.tl.types import User as TelegramUser
@@ -188,7 +189,7 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
             data = self.filter(**user_filter)
             if combined_filter:
                 data = data.filter(combined_filter)
-            result = list(data)
+            result = await sync_to_async(list)(data)  # type: ignore
             return result, len(result)
         except self.model.DoesNotExist:
             return [], 0
