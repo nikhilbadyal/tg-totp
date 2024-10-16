@@ -54,7 +54,7 @@ async def send_paginated_records(user: User, page: int) -> tuple[str, list[list[
 
     page_size = user_settings.get("page_size", PAGE_SIZE)
 
-    result = await sync_to_async(Secret.objects.get_secrets)(user, page, page_size)  # type: ignore[misc]
+    result = await sync_to_async(Secret.objects.get_secrets)(user, page, page_size)
 
     response = "**Secrets**:\n"
     for secret in result["data"]:

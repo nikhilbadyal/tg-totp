@@ -51,7 +51,7 @@ async def handle_reset_confirm_response(
     logger.debug("Received reset callback")
     if event.data == reset_yes_data:
         user = await get_user(event)
-        size = await Secret.objects.clear_user_secrets(user=user)  # type: ignore[misc]
+        size = await Secret.objects.clear_user_secrets(user=user)
         await event.edit(f"Deleted {size} secrets.")
     elif event.data == reset_no_data:
         await event.edit(ignore)
