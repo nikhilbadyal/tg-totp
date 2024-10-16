@@ -39,7 +39,7 @@ class UserManager(models.Manager):  # type: ignore[type-arg]
                 "telegram_id": telegram_user.id,
                 "name": f"{telegram_user.first_name} {telegram_user.last_name}",
             }
-            user = await User.objects.acreate(**user_dict)  # type: ignore[misc]
+            user = await User.objects.acreate(**user_dict)
 
         return user
 

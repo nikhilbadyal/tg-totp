@@ -168,7 +168,7 @@ def parse_secret(secret_string: str) -> dict[str, str]:
     # Loop through each key-value pair and extract the values
     for pair in key_value_pairs:
         key, value = pair.split("=")
-        if key in Secret.objects.possible_inputs():  # type: ignore[misc]
+        if key in Secret.objects.possible_inputs():
             secret_data[key.strip()] = value.strip()
 
     # Check if 'secret' and 'issuer' fields are present in the secret_data
@@ -194,7 +194,7 @@ async def add_secret_data(secret_data: dict[str, str], user: User) -> str:
     """Add secret data."""
     is_valid_2fa_secret(secret_data["secret"])
     # Get the user associated with the message
-    await Secret.objects.create_secret(user=user, **secret_data)  # type: ignore[misc]
+    await Secret.objects.create_secret(user=user, **secret_data)
     return added_secret
 
 
@@ -269,7 +269,7 @@ def import_failure_output_file(import_failures: dict[str, list[dict[str, str]]])
 async def get_user(event: events.NewMessage.Event) -> User:
     """Get out user from telegram user."""
     telegram_user: TelegramUser = await get_telegram_user(event)
-    return await User.objects.get_user(telegram_user=telegram_user)  # type: ignore[misc]
+    return await User.objects.get_user(telegram_user=telegram_user)
 
 
 def or_filters(filters: dict[str, Any]) -> list[Any]:
