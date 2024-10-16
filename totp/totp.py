@@ -32,7 +32,7 @@ class OTP(object):
         """Generate TOTP."""
         try:
             otp = pyotp.parse_uri(secret_uri)
-            data_points = Secret.objects.possible_inputs()  # type: ignore[misc]
+            data_points = Secret.objects.possible_inputs()
             secret_data = {
                 my_data: str(getattr(otp, data)) for data, my_data in data_points.items() if getattr(otp, data, None)
             }
