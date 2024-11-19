@@ -13,5 +13,5 @@ pytest-html==4.1.1  #https://github.com/pytest-dev/pytest-html
 pytest-sugar==1.0.0  # https://github.com/Frozenball/pytest-sugar
 qrcode[pil]==8.0  #https://github.com/lincolnloop/python-qrcode
 requests==2.32.3 #https://github.com/psf/requests
-telethon==1.38.0 #https://github.com/LonamiWebs/Telethon
+telethon==1.38.1 #https://github.com/LonamiWebs/Telethon
 watchdog==6.0.0 #https://github.com/gorakhargosh/watchdog
