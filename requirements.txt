@@ -1,6 +1,6 @@
 aiofiles==24.1.0 #https://github.com/Tinche/aiofiles
 django==5.1.5 #https://github.com/django/django
-django-environ==0.11.2  #https://github.com/joke2k/django-environ
+django-environ==0.12.0  #https://github.com/joke2k/django-environ
 django-stubs[compatible-mypy] #https://github.com/typeddjango/django-stubs
 environs==14.1.0
 loguru==0.7.3 #https://github.com/Delgan/loguru
