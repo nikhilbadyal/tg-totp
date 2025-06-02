@@ -33,13 +33,13 @@ class UserManager(models.Manager):  # type: ignore[type-arg]
         """
         try:
             # https://github.com/typeddjango/django-stubs/issues/1493
-            user: User = await self.filter(telegram_id=telegram_user.id).aget()
+            user: User = await self.filter(telegram_id=telegram_user.id).aget()  # type: ignore [attr-defined]
         except self.model.DoesNotExist:
             user_dict = {
                 "telegram_id": telegram_user.id,
                 "name": f"{telegram_user.first_name} {telegram_user.last_name}",
             }
-            user = await User.objects.acreate(**user_dict)
+            user = await User.objects.acreate(**user_dict)  # type: ignore [attr-defined]
 
         return user
 
@@ -105,7 +105,7 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
     async def create_secret(self: Self, user: User, **kwargs: Any) -> "Secret":
         """Add secret."""
         try:
-            obj = await self.acreate(user=user, **kwargs)
+            obj = await self.acreate(user=user, **kwargs)  # type: ignore [attr-defined]
             if isinstance(obj, Secret):
                 return obj
             raise IntegrityError
@@ -204,7 +204,7 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
         -------
             int:no of records
         """
-        count = await self.filter(user=user).acount()
+        count = await self.filter(user=user).acount()  # type: ignore [attr-defined]
         return int(count)
 
     def reduced_print(self: Self, secret: "Secret") -> Any:
@@ -244,13 +244,13 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
 
     async def clear_user_secrets(self: Self, user: User) -> int:
         """Clear all secret for a given user."""
-        deleted, _ = await self.filter(user=user).adelete()
-        return deleted
+        deleted, _ = await self.filter(user=user).adelete()  # type: ignore [attr-defined]
+        return int(deleted)
 
     async def rm_user_secret(self: Self, user: User, secret_id: int) -> int:
         """Clear secret with given id."""
-        deleted, _ = await self.filter(user=user, id=secret_id).adelete()
-        return deleted
+        deleted, _ = await self.filter(user=user, id=secret_id).adelete()  # type: ignore [attr-defined]
+        return int(deleted)
 
 
 class Secret(models.Model):
