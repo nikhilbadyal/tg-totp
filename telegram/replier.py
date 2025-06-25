@@ -6,6 +6,7 @@ from typing import Self
 from loguru import logger
 from telethon import TelegramClient
 
+from main import env
 from telegram.commands.add import add_add_handlers
 from telegram.commands.adduri import add_adduri_handlers
 from telegram.commands.addurifile import add_addurifile_handlers
@@ -33,8 +34,6 @@ class Telegram(object):
         Args:
             session_file (str): The path to the session file to use for connecting to the Telegram API.
         """
-        from main import env
-
         # Create a new TelegramClient instance with the given session file and API credentials
         self.client: TelegramClient = TelegramClient(
             session_file,

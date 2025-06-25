@@ -12,6 +12,8 @@ from manage import init_django
 from sqlitedb.lookups import ILike
 from sqlitedb.utils import UserStatus, paginate_queryset
 from telegram.exceptions import DuplicateSecretError
+from telegram.utils import or_filters, prepare_user_filter
+from totp.totp import OTP
 
 init_django()
 
@@ -33,13 +35,13 @@ class UserManager(models.Manager):  # type: ignore[type-arg]
         """
         try:
             # https://github.com/typeddjango/django-stubs/issues/1493
-            user: User = await self.filter(telegram_id=telegram_user.id).aget()  # type: ignore [attr-defined]
+            user: User = await self.filter(telegram_id=telegram_user.id).aget()
         except self.model.DoesNotExist:
             user_dict = {
                 "telegram_id": telegram_user.id,
                 "name": f"{telegram_user.first_name} {telegram_user.last_name}",
             }
-            user = await User.objects.acreate(**user_dict)  # type: ignore [attr-defined]
+            user = await User.objects.acreate(**user_dict)
 
         return user
 
@@ -105,7 +107,7 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
     async def create_secret(self: Self, user: User, **kwargs: Any) -> "Secret":
         """Add secret."""
         try:
-            obj = await self.acreate(user=user, **kwargs)  # type: ignore [attr-defined]
+            obj = await self.acreate(user=user, **kwargs)
             if isinstance(obj, Secret):
                 return obj
             raise IntegrityError
@@ -135,8 +137,6 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
         -------
             dict: A dictionary containing the paginated records and pagination details.
         """
-        from telegram.utils import or_filters, prepare_user_filter
-
         user_filter = prepare_user_filter(user)
         combined_filter = or_filters(user_filter)
         data = (
@@ -180,8 +180,6 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
         -------
             tuple: Data and the no of records in it
         """
-        from telegram.utils import or_filters, prepare_user_filter
-
         # noinspection PyTypeChecker
         try:
             user_filter = prepare_user_filter(user)
@@ -204,7 +202,7 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
         -------
             int:no of records
         """
-        count = await self.filter(user=user).acount()  # type: ignore [attr-defined]
+        count = await self.filter(user=user).acount()
         return int(count)
 
     def reduced_print(self: Self, secret: "Secret") -> Any:
@@ -214,8 +212,6 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
         -------
             str: String repr of secret.
         """
-        from totp.totp import OTP
-
         otp, valid_till, time_left = OTP.now(secret=secret.secret)
 
         return (
@@ -244,12 +240,12 @@ class SecretManager(models.Manager):  # type: ignore[type-arg]
 
     async def clear_user_secrets(self: Self, user: User) -> int:
         """Clear all secret for a given user."""
-        deleted, _ = await self.filter(user=user).adelete()  # type: ignore [attr-defined]
+        deleted, _ = await self.filter(user=user).adelete()
         return int(deleted)
 
     async def rm_user_secret(self: Self, user: User, secret_id: int) -> int:
         """Clear secret with given id."""
-        deleted, _ = await self.filter(user=user, id=secret_id).adelete()  # type: ignore [attr-defined]
+        deleted, _ = await self.filter(user=user, id=secret_id).adelete()
         return int(deleted)
 
 

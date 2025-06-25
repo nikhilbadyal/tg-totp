@@ -1,6 +1,9 @@
 #!/usr/bin/env python # noqa: D100
 from pathlib import Path
 
+import django
+from django.conf import settings
+
 
 def init_django() -> None:
     """Initialize Django.
@@ -9,9 +12,7 @@ def init_django() -> None:
     database and the `sqlitedb` app. If the settings have already been
     configured, this function does nothing.
     """
-    import django
-    import environ
-    from django.conf import settings
+    import environ  # noqa: PLC0415
 
     env = environ.Env()
     base_dir = Path(__file__).resolve().parent

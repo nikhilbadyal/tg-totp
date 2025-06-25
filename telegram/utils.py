@@ -24,8 +24,22 @@ from telethon.extensions import markdown
 from telethon.tl.types import User as TelegramUser
 
 from sqlitedb.models import Secret, User
+from telegram.commands.add import add_usage
+from telegram.commands.adduri import adduri_usage
+from telegram.commands.addurifile import addurifile_usage
+from telegram.commands.export import export_usage
+from telegram.commands.exportqr import exportqr_usage
+from telegram.commands.help import help_usage
+from telegram.commands.list import list_usage
+from telegram.commands.reset import reset_usage
+from telegram.commands.rm import rm_usage
+from telegram.commands.settings import settings_usage
+from telegram.commands.start import start_usage
+from telegram.commands.temp import temp_usage
+from telegram.commands.total import total_usage
 from telegram.exceptions import DuplicateSecretError, FileProcessFailError, InvalidSecretError, TGOtpError
 from telegram.strings import added_secret, no_input
+from totp.totp import OTP
 
 # Number of records per page
 PAGE_SIZE = 10
@@ -245,8 +259,6 @@ def extract_secret_from_uri(
     uris: list[str],
 ) -> tuple[list[dict[str, str]], dict[str, list[dict[str, str]]]]:
     """Extract secrets from URI."""
-    from totp.totp import OTP
-
     secrets = []
     failed: dict[str, list[dict[str, str]]] = {"invalid": []}
     for uri in uris:
@@ -327,20 +339,6 @@ def all_files(folder_name: Path) -> None:
 
 def command_help(command: str) -> str:
     """Return func for command helper."""
-    from telegram.commands.add import add_usage
-    from telegram.commands.adduri import adduri_usage
-    from telegram.commands.addurifile import addurifile_usage
-    from telegram.commands.export import export_usage
-    from telegram.commands.exportqr import exportqr_usage
-    from telegram.commands.help import help_usage
-    from telegram.commands.list import list_usage
-    from telegram.commands.reset import reset_usage
-    from telegram.commands.rm import rm_usage
-    from telegram.commands.settings import settings_usage
-    from telegram.commands.start import start_usage
-    from telegram.commands.temp import temp_usage
-    from telegram.commands.total import total_usage
-
     mapper = {
         "add": add_usage(),
         "adduri": adduri_usage(),
