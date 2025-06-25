@@ -58,7 +58,7 @@ repos:
         args:
           - '--strict'
           - "--config=pyproject.toml"
-        additional_dependencies: [ types-requests,telethon,"django-stubs[compatible-mypy]",types-aiofiles ]
+        additional_dependencies: [ types-requests,telethon,"django-stubs[compatible-mypy]",types-aiofiles,environ ]
 
 ci:
     autofix_commit_msg: |

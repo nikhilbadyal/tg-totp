@@ -14,5 +14,5 @@ class ILike(Lookup):  # type: ignore[type-arg]
         """SQL from ilike django opr."""
         lhs, lhs_params = self.process_lhs(compiler, connection)
         rhs, rhs_params = self.process_rhs(compiler, connection)
-        params = lhs_params + rhs_params
+        params = list(lhs_params) + list(rhs_params)
         return f"{lhs} ILIKE {rhs}", params
