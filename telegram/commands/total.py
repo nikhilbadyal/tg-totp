@@ -23,7 +23,7 @@ def total_usage() -> str:
 
 
 # Register the function to handle the /total command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.TOTAL.value}$"))  # type: ignore[misc]
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.TOTAL.value}$"))  # type: ignore[untyped-decorator]
 async def handle_total_message(event: events.NewMessage.Event) -> None:
     """Handle /total command.
 

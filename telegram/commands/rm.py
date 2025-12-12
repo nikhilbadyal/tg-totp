@@ -26,7 +26,7 @@ def rm_usage() -> str:
 
 
 # Register the function to handle the /rm command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.RM.value}(.*)"))  # type: ignore[misc]
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.RM.value}(.*)"))  # type: ignore[untyped-decorator]
 async def handle_rm_message(event: events.NewMessage.Event) -> None:
     """Handle /rm command.
 

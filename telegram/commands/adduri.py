@@ -26,7 +26,7 @@ def adduri_usage() -> str:
 
 
 # Register the function to handle the /adduri command
-@events.register(events.NewMessage(pattern=rf"^{SupportedCommands.ADDURI.value}(?!file)(.*)"))  # type: ignore[misc]
+@events.register(events.NewMessage(pattern=rf"^{SupportedCommands.ADDURI.value}(?!file)(.*)"))  # type: ignore[untyped-decorator]
 async def handle_adduri_message(event: events.NewMessage.Event) -> None:
     """Handle /adduri command.
 

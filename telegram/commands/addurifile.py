@@ -31,7 +31,7 @@ def addurifile_usage() -> str:
 
 
 # Register the function to handle the /addurifile command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.ADDURIFILE.value}$"))  # type: ignore[misc]
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.ADDURIFILE.value}$"))  # type: ignore[untyped-decorator]
 async def handle_addurifile_message(event: events.NewMessage.Event) -> None:
     """Handle /addurifile command.
 

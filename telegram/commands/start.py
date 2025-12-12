@@ -18,7 +18,7 @@ def start_usage() -> str:
 
 
 # Register the function to handle the /start command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.START.value}$"))  # type: ignore[misc]
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.START.value}$"))  # type: ignore[untyped-decorator]
 async def handle_start_message(event: events.NewMessage.Event) -> None:
     """Handle /start command.
 

@@ -28,7 +28,7 @@ def reset_usage() -> str:
     return "This command will help you in cleaning up all the secrets.It doesn't expect any arguments."
 
 
-@events.register(events.callbackquery.CallbackQuery(pattern="^reset_(yes|no)$"))  # type: ignore[misc]
+@events.register(events.callbackquery.CallbackQuery(pattern="^reset_(yes|no)$"))  # type: ignore[untyped-decorator]
 async def handle_reset_confirm_response(
     event: events.callbackquery.CallbackQuery.Event,
 ) -> None:
@@ -58,7 +58,7 @@ async def handle_reset_confirm_response(
 
 
 # Register the function to handle the /reset command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.RESET.value}$"))  # type: ignore[misc]
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.RESET.value}$"))  # type: ignore[untyped-decorator]
 async def handle_reset_command(event: events.NewMessage.Event) -> None:
     """Handle /reset command Delete all message history for a user.
 

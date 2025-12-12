@@ -25,7 +25,7 @@ def get_usage() -> str:
 
 
 # Register the function to handle the /get command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.GET.value}(.*)"))  # type: ignore[misc]
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.GET.value}(.*)"))  # type: ignore[untyped-decorator]
 async def handle_get_message(event: events.NewMessage.Event) -> None:
     """Handle /get command.
 

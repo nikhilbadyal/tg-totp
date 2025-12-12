@@ -23,7 +23,7 @@ def list_usage() -> str:
     )
 
 
-@events.register(events.CallbackQuery(pattern=r"(next|prev)_page:(\d+)"))  # type: ignore[misc]
+@events.register(events.CallbackQuery(pattern=r"(next|prev)_page:(\d+)"))  # type: ignore[untyped-decorator]
 async def navigate_pages(event: events.callbackquery.CallbackQuery.Event) -> None:
     """Event handler to navigate between pages of records.
 
@@ -85,7 +85,7 @@ async def send_paginated_records(user: User, page: int) -> tuple[str, list[list[
 
 
 # Register the function to handle the /list command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.LIST.value}$"))  # type: ignore[misc]
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.LIST.value}$"))  # type: ignore[untyped-decorator]
 async def handle_list_command(event: events.NewMessage.Event) -> None:
     """Event handler for the /list command.
 

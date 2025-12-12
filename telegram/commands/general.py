@@ -14,7 +14,7 @@ def add_general_handlers(client: TelegramClient) -> None:
 
 
 # Register the function to handle any new message that matches the specified pattern
-@events.register(events.NewMessage(pattern=get_regex()))  # type: ignore[misc]
+@events.register(events.NewMessage(pattern=get_regex()))  # type: ignore[untyped-decorator]
 async def handle_any_message(event: events.NewMessage.Event) -> None:
     """Handle any new message.
 

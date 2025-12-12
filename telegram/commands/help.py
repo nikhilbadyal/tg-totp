@@ -45,7 +45,7 @@ def help_usage() -> str:
 
 
 # Register the function to handle the /help command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.HELP.value}(.*)"))  # type: ignore[misc]
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.HELP.value}(.*)"))  # type: ignore[untyped-decorator]
 async def handle_help_message(event: events.NewMessage.Event) -> None:
     """Handle /help command.
 

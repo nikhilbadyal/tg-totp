@@ -25,7 +25,7 @@ def settings_usage() -> str:
     )
 
 
-@events.register(events.CallbackQuery(pattern="list_settings"))  # type: ignore[misc]
+@events.register(events.CallbackQuery(pattern="list_settings"))  # type: ignore[untyped-decorator]
 async def handle_settings_list_settings(
     event: events.callbackquery.CallbackQuery.Event,
 ) -> None:
@@ -43,7 +43,7 @@ async def handle_settings_list_settings(
     await event.edit(response, parse_mode="markdown")
 
 
-@events.register(events.CallbackQuery(pattern="current_settings"))  # type: ignore[misc]
+@events.register(events.CallbackQuery(pattern="current_settings"))  # type: ignore[untyped-decorator]
 async def handle_settings_current_settings(
     event: events.callbackquery.CallbackQuery.Event,
 ) -> None:
@@ -68,7 +68,7 @@ async def handle_settings_current_settings(
     await event.edit(response, parse_mode="markdown")
 
 
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.SETTINGS.value}"))  # type: ignore[misc]
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.SETTINGS.value}"))  # type: ignore[untyped-decorator]
 async def handle_settings_command(event: events.NewMessage.Event) -> None:
     """Event handler for the /settings command.
 

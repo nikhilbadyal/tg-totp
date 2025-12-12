@@ -25,7 +25,7 @@ def temp_usage() -> str:
 
 
 # Register the function to handle the /temp command
-@events.register(events.NewMessage(pattern=rf"^{SupportedCommands.TEMP.value}(.*)"))  # type: ignore[misc]
+@events.register(events.NewMessage(pattern=rf"^{SupportedCommands.TEMP.value}(.*)"))  # type: ignore[untyped-decorator]
 async def handle_temp_message(event: events.NewMessage.Event) -> None:
     """Handle /temp command.
 

@@ -72,7 +72,7 @@ def add_usage() -> str:
 
 
 # Register the function to handle the /add command
-@events.register(events.NewMessage(pattern=rf"^{SupportedCommands.ADD.value}(?!uri)(.*)"))  # type: ignore[misc]
+@events.register(events.NewMessage(pattern=rf"^{SupportedCommands.ADD.value}(?!uri)(.*)"))  # type: ignore[untyped-decorator]
 async def handle_add_message(event: events.NewMessage.Event) -> None:
     """Handle /add command.
 
