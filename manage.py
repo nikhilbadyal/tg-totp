@@ -1,4 +1,4 @@
-#!/usr/bin/env python # noqa: D100
+#!/usr/bin/env python
 from pathlib import Path
 
 import django
