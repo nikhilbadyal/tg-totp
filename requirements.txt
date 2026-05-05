@@ -10,7 +10,7 @@ pyotp==2.9.0 #https://pypi.org/project/pyotp/
 pytest-cov==7.1.0 #https://github.com/pytest-dev/pytest-cov
 pytest-django==4.11.1
 pytest-html==4.1.1  #https://github.com/pytest-dev/pytest-html
-pytest-sugar==1.0.0  # https://github.com/Frozenball/pytest-sugar
+pytest-sugar==1.1.1  # https://github.com/Frozenball/pytest-sugar
 qrcode[pil]==8.2 #https://github.com/lincolnloop/python-qrcode
 requests==2.33.1 #https://github.com/psf/requests
 telethon==1.43.2 #https://github.com/LonamiWebs/Telethon
