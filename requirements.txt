@@ -1,4 +1,4 @@
-aiofiles==24.1.0 #https://github.com/Tinche/aiofiles
+aiofiles==25.1.0 #https://github.com/Tinche/aiofiles
 django==6.0.5 #https://github.com/django/django
 django-environ==0.12.0  #https://github.com/joke2k/django-environ
 django-stubs[compatible-mypy] #https://github.com/typeddjango/django-stubs
