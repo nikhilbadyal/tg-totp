@@ -6,7 +6,7 @@ environs==15.0.1
 loguru==0.7.3 #https://github.com/Delgan/loguru
 pre-commit==4.6.0 #https://github.com/pre-commit/pre-commit
 psycopg2-binary==2.9.12   # https://github.com/psycopg/psycopg2
-pyotp==2.9.0 #https://pypi.org/project/pyotp/
+pyotp==2.10.0 #https://pypi.org/project/pyotp/
 pytest-cov==7.1.0 #https://github.com/pytest-dev/pytest-cov
 pytest-django==4.12.0
 pytest-html==4.2.0  #https://github.com/pytest-dev/pytest-html
